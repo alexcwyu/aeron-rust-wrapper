@@ -7,7 +7,7 @@ pub mod ffi{
     // C++ types and signatures exposed to Rust.
     unsafe extern "C++" {
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/AtomicBuffer.h");
-        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/AtomicBuffer.cpp");
+
 
         type AtomicBuffer;
 
@@ -30,8 +30,13 @@ pub mod ffi{
 
         //template <typename struct_t> struct_t &overlayStruct()
 
-        unsafe fn new_atomic_buffer(buffer: *mut u8, length: usize) -> UniquePtr<AtomicBuffer>;
+        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/AtomicBuffer.cpp");
 
+        #[namespace = "aeron::concurrent::atomic_buffer"]
+        #[rust_name = "new_instance"]
+        unsafe fn newInstance(buffer: *mut u8, length: usize) -> UniquePtr<AtomicBuffer>;
+
+        #[namespace = "aeron::concurrent::atomic_buffer"]
         fn wrap_atomic_buffer(buffer : &AtomicBuffer) -> UniquePtr<AtomicBuffer>;
     }
 }

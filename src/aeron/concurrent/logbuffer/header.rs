@@ -10,7 +10,7 @@ pub mod ffi {
         type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/logbuffer/Header.h");
-        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/Header.cpp");
+
         type Header;
 
         #[rust_name = "initial_term_id"]
@@ -55,7 +55,11 @@ pub mod ffi {
 
         //void *context() const
 
-        fn get_buffer_from_header(header: Pin<&mut Header>) -> UniquePtr<AtomicBuffer>;
-        fn say_hello_header();
+        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/Header.cpp");
+        #[namespace = "aeron::concurrent::logbuffer::header"]
+        fn buffer(header: Pin<&mut Header>) -> UniquePtr<AtomicBuffer>;
+        #[namespace = "aeron::concurrent::logbuffer::header"]
+        #[rust_name = "say_hello"]
+        fn sayHello();
     }
 }

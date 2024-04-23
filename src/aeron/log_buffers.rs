@@ -8,12 +8,18 @@ pub mod ffi {
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/LogBuffers.h");
+        type LogBuffers;
+
+
         include!("aeron-rust-wrapper/cxx_wrapper/LogBuffers.cpp");
 
-        type LogBuffers;
-        fn say_hello_log_buffers();
+        #[namespace = "aeron::logbuffers"]
+        #[rust_name = "say_hello"]
+        fn sayHello();
 
-        fn get_buffer_from_log_buffers(log_buffers: Pin<&mut LogBuffers>, index: i32) -> UniquePtr<AtomicBuffer>;
+        #[namespace = "aeron::logbuffers"]
+        #[rust_name = "atomic_buffer"]
+        fn atomicBuffer(log_buffers: Pin<&mut LogBuffers>, index: i32) -> UniquePtr<AtomicBuffer>;
 
     }
 }

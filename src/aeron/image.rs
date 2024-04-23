@@ -12,7 +12,6 @@ pub mod ffi {
         type LogBuffers = crate::aeron::log_buffers::ffi::LogBuffers;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Image.h");
-        include!("aeron-rust-wrapper/cxx_wrapper/Image.cpp");
 
         type Image;
 
@@ -59,13 +58,33 @@ pub mod ffi {
         //std::string sourceIdentity() const
         //void position(std::int64_t newPosition)
 
-        fn image_poll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), fragmentLimit: i32) -> i32;
-        fn image_bounded_poll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), limitPosition: i64, fragmentLimit: i32) -> i32;
-        fn image_controlled_poll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, fragmentLimit: i32) -> i32;
-        fn image_bounded_controlled_poll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64, fragmentLimit: i32) -> i32;
-        fn image_controlled_peek(image: Pin<&mut Image>, initialPosition: i64, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64) -> i64;
-        fn image_block_poll(image: Pin<&mut Image>, blockHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, sessionId: i32, termId: i32) -> (), blockLengthLimit: i32) -> i32;
+        include!("aeron-rust-wrapper/cxx_wrapper/Image.cpp");
 
-        fn say_hello_image();
+        #[namespace = "aeron::image"]
+        fn poll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), fragmentLimit: i32) -> i32;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "bounded_poll"]
+        fn boundedPoll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), limitPosition: i64, fragmentLimit: i32) -> i32;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "controlled_poll"]
+        fn controlledPoll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, fragmentLimit: i32) -> i32;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "bounded_controlled_poll"]
+        fn boundedControlledPoll(image: Pin<&mut Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64, fragmentLimit: i32) -> i32;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "controlled_peek"]
+        fn controlledPeek(image: Pin<&mut Image>, initialPosition: i64, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64) -> i64;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "block_poll"]
+        fn blockPoll(image: Pin<&mut Image>, blockHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, sessionId: i32, termId: i32) -> (), blockLengthLimit: i32) -> i32;
+
+        #[namespace = "aeron::image"]
+        #[rust_name = "say_hello"]
+        fn sayHello();
     }
 }

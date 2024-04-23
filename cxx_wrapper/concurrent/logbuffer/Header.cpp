@@ -7,15 +7,15 @@
 #include "concurrent/logbuffer/LogBufferDescriptor.h"
 
 
-namespace aeron { namespace concurrent { namespace logbuffer{
+namespace aeron { namespace concurrent { namespace logbuffer{  namespace header{
 
-std::unique_ptr<aeron::concurrent::AtomicBuffer> get_buffer_from_header(aeron::concurrent::logbuffer::Header & header){
+std::unique_ptr<aeron::concurrent::AtomicBuffer> buffer(aeron::concurrent::logbuffer::Header & header){
 auto wrapped_buffer = new aeron::concurrent::AtomicBuffer();
     wrapped_buffer->wrap(header.buffer());
     return std::unique_ptr<AtomicBuffer>(wrapped_buffer);
 }
 
-void say_hello_header() {
+void sayHello() {
     std::cout << "Hello, world from Header!" << std::endl;
 }
-}}}
+}}}}

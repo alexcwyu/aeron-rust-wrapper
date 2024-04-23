@@ -3,8 +3,8 @@
 #include <memory>
 #include "Context.h"
 
-namespace aeron {
-void say_hello_context() {
+namespace aeron { namespace context{
+void sayHello() {
     std::cout << "Hello, world from Context!" << std::endl;
 }
-}
+}}

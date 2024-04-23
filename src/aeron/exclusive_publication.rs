@@ -4,7 +4,7 @@ pub mod ffi {
 
     unsafe extern "C++" {
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ExclusivePublication.h");
-        include!("aeron-rust-wrapper/cxx_wrapper/ExclusivePublication.cpp");
+
 
         type ExclusivePublication;
 
@@ -92,6 +92,9 @@ pub mod ffi {
 
         //std::int64_t tryClaim(util::index_t length, concurrent::logbuffer::BufferClaim &bufferClaim)
 
-        fn say_hello_exclusive_publication();
+        include!("aeron-rust-wrapper/cxx_wrapper/ExclusivePublication.cpp");
+        #[namespace = "aeron::exclusive_publication"]
+        #[rust_name = "say_hello"]
+        fn sayHello();
     }
 }

@@ -3,8 +3,8 @@
 #include <memory>
 #include "Aeron.h"
 
-namespace aeron {
-void say_hello_aeron() {
+namespace aeron { namespace aeron{
+void sayHello() {
     std::cout << "Hello, world from Aeron!" << std::endl;
 }
-}
+}}
