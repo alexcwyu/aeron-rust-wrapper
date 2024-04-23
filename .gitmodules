@@ -1,3 +1,4 @@
 [submodule "aeron"]
 	path = aeron
 	url = git@github.com:alexcwyu/aeron.git
+    branch = feature/rust_wrapper
