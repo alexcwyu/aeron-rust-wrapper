@@ -95,4 +95,6 @@ pub mod ffi {
         #[rust_name = "say_hello"]
         fn sayHello();
     }
+
+//    impl_shared_ptr_target!("publication", "Publication", crate::aeron::publication::ffi::Publication);
 }
