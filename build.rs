@@ -36,7 +36,16 @@ fn main() {
     ].into_iter().map(|src|std::path::PathBuf::from(rust_cxx_wrapper_dir.to_owned() + "/" + src));
 
 
+    let example_files = [
+        "src/example.cc",
+        "src/example2.cc",
+        "cxx_wrapper/example.h",
+        "cxx_wrapper/example2.h",
+    ].into_iter().map(|src|std::path::PathBuf::from(src));
+
     let bridge_files = [
+        "src/example.rs",
+        "src/example2.rs",
         "src/aeron/aeron.rs",
         "src/aeron/context.rs",
         "src/aeron/exclusive_publication.rs",
@@ -56,10 +65,14 @@ fn main() {
             &aeron_lib_path,
         ])
         .files(aeron_client_cpps)
+        .files(example_files.clone())
         .files(aeron_wrapper_cpps.clone())
         .std("c++14")
         .compile("aeron-rust-wrapper");
 
+    example_files.for_each(|src| {
+        println!("cargo:rerun-if-changed={}", src.to_str().unwrap());
+    });
     bridge_files.for_each(|src| {
         println!("cargo:rerun-if-changed={}", src.to_str().unwrap());
     });

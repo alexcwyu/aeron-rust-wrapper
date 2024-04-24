@@ -13,4 +13,6 @@ pub mod ffi {
         #[rust_name = "say_hello"]
         fn sayHello();
     }
+
+    impl SharedPtr<Context> {}
 }

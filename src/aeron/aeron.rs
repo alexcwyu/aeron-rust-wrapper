@@ -6,13 +6,18 @@ pub mod ffi {
 
         #[namespace = "aeron"]
         type Context = crate::aeron::context::ffi::Context;
+
         #[namespace = "aeron"]
         type Subscription = crate::aeron::subscription::ffi::Subscription;
 
         #[namespace = "aeron"]
         type Publication = crate::aeron::publication::ffi::Publication;
+
         #[namespace = "aeron"]
         type ExclusivePublication = crate::aeron::exclusive_publication::ffi::ExclusivePublication;
+
+        #[namespace = "aeron::concurrent"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Aeron.h");
@@ -31,17 +36,17 @@ pub mod ffi {
         #[rust_name = "add_exclusive_publication"]
         fn addExclusivePublication(self: Pin<&mut Aeron>, channel: &CxxString, stream_id: i32) -> i64;
 
-        // #[rust_name = "find_publication"]
-        // fn findPublication(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<Publication>;
+        #[rust_name = "find_publication"]
+        fn findPublication(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<Publication>;
 
-        // #[rust_name = "find_exclusive_publication"]
-        // fn findExclusivePublication(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<ExclusivePublication>;
+        #[rust_name = "find_exclusive_publication"]
+        fn findExclusivePublication(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<ExclusivePublication>;
 
         #[rust_name = "add_subscription"]
         fn addSubscription(self: Pin<&mut Aeron>, channel: &CxxString, stream_id: i32) -> i64;
 
-        // #[rust_name = "find_subscription"]
-        // fn findSubscription(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<Subscription>;
+        #[rust_name = "find_subscription"]
+        fn findSubscription(self: Pin<&mut Aeron>, registration_id: i64) -> SharedPtr<Subscription>;
 
         #[rust_name = "next_correlation_id"]
         fn nextCorrelationId(self: Pin<&mut Aeron>) -> i64;

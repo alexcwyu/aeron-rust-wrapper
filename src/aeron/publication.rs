@@ -96,5 +96,5 @@ pub mod ffi {
         fn sayHello();
     }
 
-//    impl_shared_ptr_target!("publication", "Publication", crate::aeron::publication::ffi::Publication);
+    impl SharedPtr<Publication> {}
 }
