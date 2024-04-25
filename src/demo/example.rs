@@ -1,9 +1,7 @@
-use cxx::CxxString;
-
 #[cxx::bridge(namespace = "example")]
 pub mod ffi {
     unsafe extern "C++" {
-        include!("aeron-rust-wrapper/cxx_wrapper/example.h");
+        include!("aeron-rust-wrapper/cxx_demo_include/example.h");
 
         type Object;
 

@@ -1,5 +1,5 @@
-#include "aeron-rust-wrapper/cxx_wrapper/closures_ffi.h"
-#include "aeron-rust-wrapper/src/closures_ffi.rs.h"
+#include "aeron-rust-wrapper/cxx_demo_include/closures_ffi.h"
+#include "aeron-rust-wrapper/src/demo/closures_ffi.rs.h"
 
 #include <iostream>
 #include <string>
@@ -57,6 +57,12 @@ void better_add_two_numbers2(int a, int b, const rust::Fn<void(std::int32_t, c_v
     cb(result, data);
 }
 
+void better_add_two_numbers3(int a, int b, const rust::Fn<void(c_void*, std::int32_t)> cb, c_void* data)
+{
+    std::int32_t result = a + b;
+    std::cout<<"calling in C, a = "<<a<<", b = "<<b<<", result = "<<result<< std::endl;
+    cb(data, result);
+}
 
 void void_ptr(void * data){
 }

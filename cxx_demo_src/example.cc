@@ -1,4 +1,4 @@
-#include "aeron-rust-wrapper/cxx_wrapper/example.h"
+#include "aeron-rust-wrapper/cxx_demo_include/example.h"
 #include <iostream>
 
 

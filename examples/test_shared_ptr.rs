@@ -1,8 +1,10 @@
 use std::ops::Deref;
 use std::ptr;
+
 use cxx::let_cxx_string;
-use aeron_rust_wrapper::example;
-use aeron_rust_wrapper::example2;
+
+use aeron_rust_wrapper::demo::example;
+use aeron_rust_wrapper::demo::example2;
 
 fn test1(){
 

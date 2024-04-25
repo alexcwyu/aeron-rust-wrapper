@@ -1,12 +1,11 @@
-use cxx::CxxString;
 #[cxx::bridge(namespace = "example2")]
 pub mod ffi {
     unsafe extern "C++" {
 
         #[namespace = "example"]
-        type Object = crate::example::ffi::Object;
+        type Object = crate::demo::example::ffi::Object;
 
-        include!("aeron-rust-wrapper/cxx_wrapper/example2.h");
+        include!("aeron-rust-wrapper/cxx_demo_include/example2.h");
         type Object2;
 
         fn createShared(name: &CxxString) -> SharedPtr<Object2>;

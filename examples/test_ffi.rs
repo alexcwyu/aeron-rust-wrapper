@@ -1,11 +1,8 @@
-
 extern crate aeron_rust_wrapper;
 
-use aeron_rust_wrapper::aeron;
-use std::pin::pin;
 use aeron_rs::concurrent::atomic_buffer::AlignedBuffer;
 use aeron_rs::concurrent::atomic_buffer::AtomicBuffer;
-
+use aeron_rust_wrapper::aeron;
 
 fn main() {
     let aligned_buffer = AlignedBuffer::with_capacity(256);

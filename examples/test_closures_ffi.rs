@@ -1,11 +1,10 @@
-
 extern crate aeron_rust_wrapper;
 
 use std::pin::{pin, Pin};
-use aeron_rust_wrapper::closures_ffi;
-use aeron_rust_wrapper::closures_ffi::Counter;
-use aeron_rust_wrapper::closures_ffi::ffi::c_void;
 
+use aeron_rust_wrapper::demo::closures_ffi;
+use aeron_rust_wrapper::demo::closures_ffi::Counter;
+use aeron_rust_wrapper::demo::closures_ffi::ffi::c_void;
 
 fn callback(x: i32){
     println!("calling in Rust, result: {}", x);
@@ -124,11 +123,51 @@ fn do_test4<F>(on_result_calculated: F)where
     }
 }
 
+fn test5(){
+    println!("######## test5");
+    let name = "test5".to_string();
+    let mut counter = Counter::default();
+    let mut closure = move|result: i32| {
+        counter.add_result(result);
+        println!("calling in Rust test5, {name}, result: {}, counter: {:?}", result, counter);
+    };
+    do_test5(&mut closure);
+    do_test5(&mut closure);
+
+}
+
+fn do_test5<F>(on_result_calculated: F)where
+    F: FnMut(i32), {
+    {
+        unsafe {
+            let mut closure = on_result_calculated;
+
+            let (mut state, mut callback) = ffi_helpers::split_closure(&mut closure);
+
+            let callback2 : fn(*mut c_void, i32) ->() = std::mem::transmute(callback as *const ());
+            let state2 = state as *mut _ as *mut c_void;
+
+            closures_ffi::ffi::better_add_two_numbers3(
+                1,
+                2,
+                callback2,
+                state2,
+            );
+
+            closures_ffi::ffi::better_add_two_numbers3(
+                1,
+                2,
+                callback2,
+                state2,
+            );
+        }
+    }
+}
 
 fn main(){
-
-    test1();
-    test2();
-    test3();
+    // test1();
+    // test2();
+    // test3();
     test4();
+    test5();
 }
