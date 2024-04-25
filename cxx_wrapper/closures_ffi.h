@@ -29,7 +29,8 @@ void simple_add_two_numbers1(int a, int b, const rust::Fn<void(std::int32_t)> cb
 
 
 void better_add_two_numbers(int a, int b, const rust::Fn<void(std::int32_t, Counter &)> cb, Counter & counter);
+void better_add_two_numbers2(int a, int b, const rust::Fn<void(std::int32_t, c_void*)> cb, c_void* user_data);
 
 void void_ptr(void * data);
-void void_ptr2(void * data);
+
 }

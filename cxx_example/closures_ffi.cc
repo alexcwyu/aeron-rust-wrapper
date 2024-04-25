@@ -50,8 +50,15 @@ void better_add_two_numbers(int a, int b, const rust::Fn<void(std::int32_t, Coun
     cb(result, counter);
 }
 
+void better_add_two_numbers2(int a, int b, const rust::Fn<void(std::int32_t, c_void*)> cb, c_void* data)
+{
+    std::int32_t result = a + b;
+    std::cout<<"calling in C, a = "<<a<<", b = "<<b<<", result = "<<result<< std::endl;
+    cb(result, data);
+}
+
+
 void void_ptr(void * data){
 }
-void void_ptr2(void * data){
-}
+
 }

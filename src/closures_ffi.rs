@@ -11,7 +11,7 @@ pub struct Counter {
 }
 
 impl Counter {
-    fn add_result(&mut self, result: i32) {
+    pub fn add_result(&mut self, result: i32) {
         self.total += result;
         self.calls += 1;
     }
@@ -35,9 +35,8 @@ pub mod ffi {
 
         fn better_add_two_numbers(a : i32, b: i32, cd : fn(i32, Pin<&mut Counter>)->(), counter: Pin<&mut Counter>);
 
-        // fn better_add_two_numbers2(a : i32, b: i32, cd : fn(i32, Pin<&mut Counter>)->(), counter: Pin<&mut Counter>);
+        unsafe fn better_add_two_numbers2(a : i32, b: i32, cd : unsafe extern "C" fn(i32, *mut c_void )->(), user_data: *mut c_void);
 
         unsafe fn void_ptr(test: *mut c_void);
-        unsafe fn void_ptr2(test: *mut c_void);
     }
 }
