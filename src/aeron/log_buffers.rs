@@ -22,4 +22,6 @@ pub mod ffi {
         fn atomicBuffer(log_buffers: Pin<&mut LogBuffers>, index: i32) -> UniquePtr<AtomicBuffer>;
 
     }
+
+    impl SharedPtr<LogBuffers> {}
 }

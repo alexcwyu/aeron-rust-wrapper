@@ -39,5 +39,7 @@ pub mod ffi{
         #[namespace = "aeron::concurrent::atomic_buffer"]
         fn wrap_atomic_buffer(buffer : &AtomicBuffer) -> UniquePtr<AtomicBuffer>;
     }
+
+    impl SharedPtr<AtomicBuffer> {}
 }
 

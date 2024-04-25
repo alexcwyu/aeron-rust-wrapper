@@ -9,6 +9,7 @@ fn main() {
     let aeron_client_cpps = [
         "Aeron.h",
         "Context.h",
+        "Counter.h",
         "ExclusivePublication.h",
         "Image.h",
         "LogBuffers.h",
@@ -16,6 +17,7 @@ fn main() {
         "Publication.h",
         "Subscription.h",
         "concurrent/AtomicBuffer.h",
+        "concurrent/CountersReader.h",
         "concurrent/logbuffer/Header.h",
         "concurrent/logbuffer/BufferClaim.h",
         "concurrent/logbuffer/FrameDescriptor.h",
@@ -24,6 +26,7 @@ fn main() {
     let aeron_wrapper_cpps = [
         "Aeron.cpp",
         "Context.cpp",
+        "Counter.cpp",
         "ExclusivePublication.cpp",
         "Image.cpp",
         "LogBuffers.cpp",
@@ -31,6 +34,7 @@ fn main() {
         "Publication.cpp",
         "Subscription.cpp",
         "concurrent/AtomicBuffer.cpp",
+        "concurrent/CountersReader.cpp",
         "concurrent/logbuffer/Header.cpp",
         "concurrent/logbuffer/BufferClaim.cpp",
     ].into_iter().map(|src|std::path::PathBuf::from(rust_cxx_wrapper_dir.to_owned() + "/" + src));
@@ -48,12 +52,14 @@ fn main() {
         "src/example2.rs",
         "src/aeron/aeron.rs",
         "src/aeron/context.rs",
+        "src/aeron/counter.rs",
         "src/aeron/exclusive_publication.rs",
         "src/aeron/image.rs",
         "src/aeron/log_buffers.rs",
         "src/aeron/publication.rs",
         "src/aeron/subscription.rs",
         "src/aeron/concurrent/atomic_buffer.rs",
+        "src/aeron/concurrent/counters_reader.rs",
         "src/aeron/concurrent/logbuffer/header.rs",
         "src/aeron/concurrent/logbuffer/buffer_claim.rs",
     ].into_iter().map(|src|std::path::PathBuf::from(src));
