@@ -3,6 +3,9 @@
 use anyhow::Result;
 use cxx::ExternType;
 
+//https://github.com/dtolnay/cxx/issues/665
+//https://github.com/dtolnay/cxx/pull/672
+
 pub trait MyData {
     fn traitfn(&self);
 }
