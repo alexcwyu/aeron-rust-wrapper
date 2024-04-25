@@ -10,6 +10,8 @@ edition = "2021"
 cxx = { verion = "1.0", features = ["c++17"] }
 aeron-rs = { path = "../aeron-rs" }
 ffi_helpers = "0.3.0"
+anyhow = "1.0.44"
+
 
 [build-dependencies]
 cxx-build = "1.0.121"

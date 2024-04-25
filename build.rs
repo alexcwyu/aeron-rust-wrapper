@@ -44,15 +44,20 @@ fn main() {
         "cxx_demo_src/example.cc",
         "cxx_demo_src/example2.cc",
         "cxx_demo_src/closures_ffi.cc",
+        "cxx_demo_src/mydata.cc",
+
         "cxx_demo_include/example.h",
         "cxx_demo_include/example2.h",
         "cxx_demo_include/closures_ffi.h",
+        "cxx_demo_include/mydata.h",
     ].into_iter().map(|src|std::path::PathBuf::from(src));
 
     let bridge_files = [
         "src/demo/example.rs",
         "src/demo/example2.rs",
         "src/demo/closures_ffi.rs",
+        "src/demo/mydata.rs",
+
         "src/aeron/aeron.rs",
         "src/aeron/context.rs",
         "src/aeron/counter.rs",
