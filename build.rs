@@ -41,15 +41,18 @@ fn main() {
 
 
     let example_files = [
-        "src/example.cc",
-        "src/example2.cc",
+        "cxx_example/example.cc",
+        "cxx_example/example2.cc",
+        "cxx_example/closures_ffi.cc",
         "cxx_wrapper/example.h",
         "cxx_wrapper/example2.h",
+        "cxx_wrapper/closures_ffi.h",
     ].into_iter().map(|src|std::path::PathBuf::from(src));
 
     let bridge_files = [
         "src/example.rs",
         "src/example2.rs",
+        "src/closures_ffi.rs",
         "src/aeron/aeron.rs",
         "src/aeron/context.rs",
         "src/aeron/counter.rs",
@@ -73,7 +76,7 @@ fn main() {
         .files(aeron_client_cpps)
         .files(example_files.clone())
         .files(aeron_wrapper_cpps.clone())
-        .std("c++14")
+        .std("c++17")
         .compile("aeron-rust-wrapper");
 
     example_files.for_each(|src| {
