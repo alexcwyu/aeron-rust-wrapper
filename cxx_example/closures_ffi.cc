@@ -46,7 +46,7 @@ void better_add_two_numbers(int a, int b, const rust::Fn<void(std::int32_t, Coun
 {
     std::int32_t result = a + b;
     std::cout<<"calling in C, a = "<<a<<", b = "<<b<<", result = "<<result<< std::endl;
-    counter.add_result(result);
+    //counter.add_result(result);
     cb(result, counter);
 }
 
