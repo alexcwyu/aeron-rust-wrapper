@@ -3,8 +3,13 @@
 pub mod ffi {
 
     unsafe extern "C++" {
-        include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ExclusivePublication.h");
+        #[namespace = "aeron::concurrent"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
 
+        #[namespace = "aeron::concurrent::logbuffer"]
+        type BufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+
+        include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ExclusivePublication.h");
 
         type ExclusivePublication;
 
@@ -92,7 +97,30 @@ pub mod ffi {
 
         //std::int64_t tryClaim(util::index_t length, concurrent::logbuffer::BufferClaim &bufferClaim)
 
+
+        #[rust_name = "offer_part"]
+        fn offer(self: Pin<&mut ExclusivePublication>, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64;
+
+        #[rust_name = "offer"]
+        fn offer(self: Pin<&mut ExclusivePublication>, buffer: &AtomicBuffer) -> i64;
+
+        #[rust_name = "try_claim"]
+        fn tryClaim(self: Pin<&mut ExclusivePublication>, length: i32, bufferClaim : Pin<&mut BufferClaim>) ->i64;
+
+
+
+
         include!("aeron-rust-wrapper/cxx_wrapper/ExclusivePublication.cpp");
+
+        #[namespace = "aeron::exclusive_publication"]
+        #[rust_name = "offer_opt"]
+        fn offer(publication: Pin<&mut ExclusivePublication>, buffer: &AtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+
+        #[namespace = "aeron::exclusive_publication"]
+        #[rust_name = "offer_bulk"]
+        fn offer(publication: Pin<&mut ExclusivePublication>, buffer: &CxxVector<AtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+
+
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "say_hello"]
         fn sayHello();

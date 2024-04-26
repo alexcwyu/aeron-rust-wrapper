@@ -56,7 +56,10 @@ pub mod ffi {
         fn close(self: Pin<&mut Image>);
 
         //std::string sourceIdentity() const
-        //void position(std::int64_t newPosition)
+
+        #[rust_name = "set_position"]
+        fn position(self: Pin<&mut Image>, newPosition: i64);
+
 
         include!("aeron-rust-wrapper/cxx_wrapper/Image.cpp");
 

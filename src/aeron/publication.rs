@@ -3,6 +3,14 @@
 pub mod ffi {
 
     unsafe extern "C++" {
+
+        #[namespace = "aeron::concurrent"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+
+
+        #[namespace = "aeron::concurrent::logbuffer"]
+        type BufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Publication.h");
 
         type Publication;
@@ -73,24 +81,28 @@ pub mod ffi {
         fn findDestinationResponse(self: Pin<&mut Publication>, correlation_id: i64) -> bool;
         fn close(self: Pin<&mut Publication>);
 
+        #[rust_name = "offer_part"]
+        fn offer(self: Pin<&mut Publication>, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64;
+
+        #[rust_name = "offer"]
+        fn offer(self: Pin<&mut Publication>, buffer: &AtomicBuffer) -> i64;
+
+        #[rust_name = "try_claim"]
+        fn tryClaim(self: Pin<&mut Publication>, length: i32, bufferClaim : Pin<&mut BufferClaim>) ->i64;
+
+
         //std::vector<std::string> localSocketAddresses() const
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer, util::index_t offset, util::index_t length, const on_reserved_value_supplier_t &reservedValueSupplier)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer, util::index_t offset, util::index_t length)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer)
-
-        //template<class BufferIterator> std::int64_t offer( BufferIterator startBuffer, BufferIterator lastBuffer, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer buffers[], std::size_t length, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //template<std::size_t N> std::int64_t offer( const std::array<concurrent::AtomicBuffer, N> &buffers, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //std::int64_t tryClaim(util::index_t length, concurrent::logbuffer::BufferClaim &bufferClaim)
 
 
         include!("aeron-rust-wrapper/cxx_wrapper/Publication.cpp");
+        #[namespace = "aeron::publication"]
+        #[rust_name = "offer_opt"]
+        fn offer(publication: Pin<&mut Publication>, buffer: &AtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+
+        #[namespace = "aeron::publication"]
+        #[rust_name = "offer_bulk"]
+        fn offer(publication: Pin<&mut Publication>, buffer: &CxxVector<AtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+
         #[namespace = "aeron::publication"]
         #[rust_name = "say_hello"]
         fn sayHello();
