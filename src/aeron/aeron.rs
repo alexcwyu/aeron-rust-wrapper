@@ -22,6 +22,7 @@ pub mod ffi {
 
         #[namespace = "aeron::concurrent"]
         type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+
         #[namespace = "aeron::concurrent"]
         type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CountersReader;
 

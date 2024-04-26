@@ -247,10 +247,23 @@ fn default_on_close_client_handler() {}
 pub mod ffi {
 
     unsafe extern "C++" {
+
+        #[namespace = "aeron"]
+        type Counter = crate::aeron::counter::ffi::Counter;
+        #[namespace = "aeron"]
+        type Image = crate::aeron::image::ffi::Image;
+
+
+        #[namespace = "aeron::concurrent"]
+        type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CountersReader;
+
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Context.h");
 
         type Context;
 
+
+        fn conclude<'a>(self: Pin<&'a mut Context>) ->Pin<&'a mut Context>;
+        
 
         #[rust_name = "set_aeron_dir"]
         fn aeronDir<'a>(self: Pin<&'a mut Context>, directory: & CxxString) ->Pin<&'a mut Context>;
@@ -266,6 +279,32 @@ pub mod ffi {
         #[rust_name = "cnc_file_name"]
         fn cncFileName(self: &Context) -> &CxxString;
 
+        #[rust_name = "set_idle_sleep_duration"]
+        fn idleSleepDuration<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
+
+        #[rust_name = "idle_sleep_duration"]
+        fn idleSleepDuration(self: &Context) -> i64;
+
+
+        #[rust_name = "set_media_driver_timeout"]
+        fn mediaDriverTimeout<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
+
+        #[rust_name = "media_driver_timeout"]
+        fn mediaDriverTimeout(self: &Context) -> i64;
+
+        #[rust_name = "set_resource_linger_timeout"]
+        fn resourceLingerTimeout<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
+
+        // #[rust_name = "resource_linger_timeout"]
+        // fn resourceLingerTimeout(self: &Context) -> i64;
+
+        #[rust_name = "use_conductor_agent_invoker"]
+        fn useConductorAgentInvoker<'a>(self: Pin<&'a mut Context>, value: bool) ->Pin<&'a mut Context>;
+
+        #[rust_name = "pre_touch_mapped_memory"]
+        fn preTouchMappedMemory<'a>(self: Pin<&'a mut Context>, value: bool) ->Pin<&'a mut Context>;
+
+
 
         // #[rust_name = "error_handler"]
         // this_t &errorHandler(const exception_handler_t &handler)
@@ -277,6 +316,50 @@ pub mod ffi {
         #[namespace = "aeron::context"]
         #[rust_name = "new_publication_handler"]
         fn newPublicationHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64)->()) -> Pin<&'a mut Context>;
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "new_exclusive_publication_handler"]
+        fn newExclusivePublicationHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64) ->()) -> Pin<&'a mut Context>;
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "new_subscription_handler"]
+        fn newSubscriptionHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, correlation_id: i64) ->()) -> Pin<&'a mut Context>;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "available_image_handler"]
+        fn availableImageHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut Image>) ->()) -> Pin<&'a mut Context>;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "unavailable_image_handler"]
+        fn unavailableImageHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut Image>) ->()) -> Pin<&'a mut Context>;
+
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "available_counter_handler"]
+        fn availableCounterHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->()) -> Pin<&'a mut Context>;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "unavailable_counter_handler"]
+        fn unavailableCounterHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->()) -> Pin<&'a mut Context>;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "close_client_handler"]
+        fn closeClientHandler<'a>(context: Pin<&'a mut Context>, handler: fn() ->()) -> Pin<&'a mut Context>;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "requestDriverTermination"]
+        unsafe fn requestDriverTermination(directory: &CxxString, tokenBuffer: *const u8, token_length: usize) -> bool;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "default_aeron_path"]
+        fn defaultAeronPath() -> String;
 
         #[namespace = "aeron::context"]
         #[rust_name = "say_hello"]

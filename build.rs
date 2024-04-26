@@ -8,6 +8,7 @@ fn main() {
 
     let aeron_client_cpps = [
         "Aeron.h",
+        "ClientConductor.h",
         "Context.h",
         "Counter.h",
         "ExclusivePublication.h",
@@ -25,6 +26,7 @@ fn main() {
 
     let aeron_wrapper_cpps = [
         "Aeron.cpp",
+        "ClientConductor.cpp",
         "Context.cpp",
         "Counter.cpp",
         "ExclusivePublication.cpp",
@@ -59,6 +61,7 @@ fn main() {
         "src/demo/mydata.rs",
 
         "src/aeron/aeron.rs",
+        "src/aeron/client_conductor.rs",
         "src/aeron/context.rs",
         "src/aeron/counter.rs",
         "src/aeron/exclusive_publication.rs",
