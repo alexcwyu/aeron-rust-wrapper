@@ -252,7 +252,32 @@ pub mod ffi {
         type Context;
 
 
+        #[rust_name = "set_aeron_dir"]
+        fn aeronDir<'a>(self: Pin<&'a mut Context>, directory: & CxxString) ->Pin<&'a mut Context>;
+
+
+        #[rust_name = "set_client_name"]
+        fn clientName<'a>(self: Pin<&'a mut Context>, client_name: & CxxString) ->Pin<&'a mut Context>;
+
+
+        #[rust_name = "client_name"]
+        fn clientName(self: & Context) -> &CxxString;
+
+        #[rust_name = "cnc_file_name"]
+        fn cncFileName(self: &Context) -> &CxxString;
+
+
+        // #[rust_name = "error_handler"]
+        // this_t &errorHandler(const exception_handler_t &handler)
+
+
+
+
         include!("aeron-rust-wrapper/cxx_wrapper/Context.cpp");
+        #[namespace = "aeron::context"]
+        #[rust_name = "new_publication_handler"]
+        fn newPublicationHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64)->()) -> Pin<&'a mut Context>;
+
         #[namespace = "aeron::context"]
         #[rust_name = "say_hello"]
         fn sayHello();

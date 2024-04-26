@@ -40,6 +40,9 @@ pub mod ffi {
         unsafe fn better_add_two_numbers3(a : i32, b: i32, cd : unsafe fn(*mut c_void, i32) ->(), user_data: *mut c_void);
 
 
+        unsafe fn better_add_two_numbers4(a : i32, b: i32, cd : unsafe fn(*mut c_void, i32, i32, i64) ->(), user_data: *mut c_void);
+
+
         unsafe fn void_ptr(test: *mut c_void);
     }
 }

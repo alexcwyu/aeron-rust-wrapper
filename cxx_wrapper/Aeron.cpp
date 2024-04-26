@@ -22,6 +22,10 @@ inline std::shared_ptr<Aeron> connect() {
     return Aeron::connect();
 }
 
+inline rust::String version() {
+    return Aeron::version();
+}
+
 //typedef std::function<void(Image &image)> on_available_image_t;
 //typedef std::function<void(Image &image)> on_unavailable_image_t;
 //inline std::int64_t addSubscription(const std::string &channel, std::int32_t streamId, const on_available_image_t &onAvailableImageHandler, const on_unavailable_image_t &onUnavailableImageHandler)

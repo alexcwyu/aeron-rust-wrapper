@@ -64,6 +64,12 @@ void better_add_two_numbers3(int a, int b, const rust::Fn<void(c_void*, std::int
     cb(data, result);
 }
 
+void better_add_two_numbers4(std::int32_t a, std::int32_t b, const rust::Fn<void(c_void*, std::int32_t, std::int32_t, std::int64_t)> cb, c_void* user_data){
+    std::int64_t result = a + b;
+    std::cout<<"calling in C, a = "<<a<<", b = "<<b<<", result = "<<result<< std::endl;
+    cb(user_data, a, b, result);
+}
+
 void void_ptr(void * data){
 }
 

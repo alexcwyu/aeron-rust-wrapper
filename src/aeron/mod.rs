@@ -7,3 +7,4 @@ pub mod log_buffers;
 pub mod publication;
 pub mod subscription;
 pub mod counter;
+pub mod client_conductor;

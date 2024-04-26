@@ -1,6 +1,9 @@
+
 extern crate aeron_rust_wrapper;
 
+use std::ffi::CString;
 use std::pin::{pin, Pin};
+use aeron_rust_wrapper::aeron::context::OnAvailableImage;
 
 use aeron_rust_wrapper::demo::closures_ffi;
 use aeron_rust_wrapper::demo::closures_ffi::Counter;
@@ -164,10 +167,167 @@ fn do_test5<F>(on_result_calculated: F)where
     }
 }
 
+/////////////
+
+
+pub trait ResultHandler {
+    fn call(&mut self, input1: i32, input2: i32, result: i64);
+    fn clone_box(&self) -> Box<dyn ResultHandler>;
+}
+
+// impl <T> FnMut<(i32, i32, i64)> for T where T: ResultHandler{
+//     type Output = ();
+//     fn call_mut(&mut self, input: (i32, i32, i64)) -> Self::Output {
+//         self.call(input.0, input.1, input.2);
+//     }
+// }
+
+impl<T> ResultHandler for T
+    where
+        T: FnMut(i32, i32, i64) + Clone + 'static,
+{
+    fn call(&mut self, input1: i32, input2: i32, result: i64) {
+        self(input1, input2, result)
+    }
+
+    fn clone_box(&self) -> Box<dyn ResultHandler> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn ResultHandler>{
+    fn clone(&self) -> Box<dyn ResultHandler> {
+        self.clone_box()
+    }
+}
+
+fn default_result_handler(input1: i32, input2: i32, result: i64) {
+    println!("default_result_handler: input1: {}, input2: {}, result3: {}", input1, input2, result);
+}
+
+
+#[derive(Clone, Debug)]
+struct ResultCounter{
+    name: String,
+    input1: i32,
+    input2: i32,
+    result: i64,
+    count: i64,
+}
+
+impl ResultCounter {
+    pub fn new(name: &str) -> Self {
+        ResultCounter {
+            name: name.to_string(),
+            input1: 0,
+            input2: 0,
+            result: 0,
+            count: 0,
+        }
+    }
+
+}
+
+impl ResultHandler for ResultCounter {
+    fn call(&mut self, input1: i32, input2: i32, result: i64) {
+        self.input1 = input1;
+        self.input2 = input2;
+        self.result = result;
+        self.count +=1;
+        println!("ResultCounter: {:?}", self);
+    }
+
+    fn clone_box(&self) -> Box<dyn ResultHandler> {
+        Box::new(self.clone())
+    }
+}
+
+
+
+fn test6(){
+    // println!("######## test6 part 1");
+    //let mut counter  = ResultCounter::new("test6 object");
+    // do_test6(&mut counter);
+    // do_test6(&mut counter);
+
+    println!("######## test6 part 2");
+    let mut counter2 = ResultCounter::new("test6 closure");
+    let mut closure = move|input1: i32, input2: i32, result: i64| {
+        counter2.call(input1, input2, result);
+        println!("calling from closure, counter: {:?}", counter2);
+    };
+
+    do_test6(&mut closure);
+    do_test6(&mut closure);
+
+    println!("######## test6 part 3");
+
+    do_test6(&mut default_result_handler);
+    do_test6(&mut default_result_handler);
+
+}
+
+fn do_test6<F>(result_handler : &mut F)where
+    F: FnMut(i32, i32, i64) + Clone + 'static, {
+    {
+        unsafe {
+            let mut closure = result_handler;
+
+            let (mut state, mut callback) = ffi_helpers::split_closure(&mut closure);
+
+            let callback2 : fn(*mut c_void, i32, i32, i64) ->() = std::mem::transmute(callback as *const ());
+            let state2 = state as *mut _ as *mut c_void;
+
+            closures_ffi::ffi::better_add_two_numbers4(
+                1,
+                2,
+                callback2,
+                state2,
+            );
+
+            closures_ffi::ffi::better_add_two_numbers4(
+                1,
+                2,
+                callback2,
+                state2,
+            );
+        }
+    }
+}
+
+
+fn test7(){
+    println!("######## test6 part 1");
+    let mut counter  = ResultCounter::new("test6 object");
+    do_test7(&mut counter);
+    do_test7(&mut counter);
+
+    println!("######## test6 part 2");
+    let mut counter2 = ResultCounter::new("test6 closure");
+    let mut closure = move|input1: i32, input2: i32, result: i64| {
+        counter2.call(input1, input2, result);
+        println!("calling from closure, counter: {:?}", counter2);
+    };
+
+    do_test7(&mut closure);
+    do_test7(&mut closure);
+
+    do_test7(&mut default_result_handler);
+    do_test7(&mut default_result_handler);
+
+}
+
+
+fn do_test7(result_handler : &mut impl ResultHandler) {
+    result_handler.call(1, 2, 3);
+}
+
 fn main(){
     // test1();
     // test2();
     // test3();
-    test4();
-    test5();
+    // test4();
+    // test5();
+    //test6();
+    test7();
 }

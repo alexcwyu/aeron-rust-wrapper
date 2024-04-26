@@ -110,6 +110,9 @@ pub mod ffi {
         #[rust_name = "connect"]
         fn connect() -> SharedPtr<Aeron>;
 
+        fn version() -> String;
+
+
         #[rust_name = "add_subscription_with_handlers"]
         fn addSubscription(aeron: Pin<&mut Aeron>, channel: &CxxString, stream_id: i32, on_available_image_t: fn(image: Pin<&mut Image>) -> (), on_unavailable_image_t: fn(image: Pin<&mut Image>) -> ()) -> i64;
 
