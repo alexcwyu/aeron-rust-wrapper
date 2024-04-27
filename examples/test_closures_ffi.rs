@@ -1,9 +1,6 @@
-
 extern crate aeron_rust_wrapper;
 
-use std::ffi::CString;
 use std::pin::{pin, Pin};
-use aeron_rust_wrapper::aeron::context::OnAvailableImage;
 
 use aeron_rust_wrapper::demo::closures_ffi;
 use aeron_rust_wrapper::demo::closures_ffi::Counter;

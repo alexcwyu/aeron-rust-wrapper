@@ -8,10 +8,20 @@ std::unique_ptr<aeron::concurrent::AtomicBuffer> newInstance(std::uint8_t *buffe
      return std::unique_ptr<aeron::concurrent::AtomicBuffer>(new aeron::concurrent::AtomicBuffer(buffer, length));
 }
 
-std::unique_ptr<aeron::concurrent::AtomicBuffer> wrap_atomic_buffer(const aeron::concurrent::AtomicBuffer &buffer){
+std::unique_ptr<aeron::concurrent::AtomicBuffer> wrapAtomicBuffer(const aeron::concurrent::AtomicBuffer &buffer){
     auto wrapped_buffer = new aeron::concurrent::AtomicBuffer();
     wrapped_buffer->wrap(buffer);
     return std::unique_ptr<AtomicBuffer>(wrapped_buffer);
 }
+
+rust::String getString(const aeron::concurrent::AtomicBuffer &buffer, util::index_t offset){
+    return buffer.getString(offset);
+    }
+
+
+rust::String getStringWithoutLength(const aeron::concurrent::AtomicBuffer &buffer, util::index_t offset, std::size_t length){
+    return buffer.getStringWithoutLength(offset, length);
+    }
+
 
 }}}

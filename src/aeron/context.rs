@@ -1,4 +1,5 @@
 use std::ffi::CString;
+
 use crate::aeron::concurrent::counters_reader::ffi::CountersReader;
 use crate::aeron::image::ffi::Image;
 
@@ -263,7 +264,7 @@ pub mod ffi {
 
 
         fn conclude<'a>(self: Pin<&'a mut Context>) ->Pin<&'a mut Context>;
-        
+
 
         #[rust_name = "set_aeron_dir"]
         fn aeronDir<'a>(self: Pin<&'a mut Context>, directory: & CxxString) ->Pin<&'a mut Context>;
