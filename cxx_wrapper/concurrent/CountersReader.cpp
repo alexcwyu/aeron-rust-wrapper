@@ -1,29 +1,31 @@
 
 #include "rust/cxx.h"
 #include <memory>
+#include <string>
 #include "concurrent/AtomicBuffer.h"
 #include "concurrent/CountersReader.h"
 
 namespace aeron { namespace concurrent { namespace counter_reader{
-void sayHello() {
-    std::cout << "Hello, world from CounterReader!" << std::endl;
+
+inline std::unique_ptr<aeron::concurrent::CountersReader> newInstance(const AtomicBuffer &metadataBuffer, const AtomicBuffer &valuesBuffer){
+    return std::make_unique<aeron::concurrent::CountersReader>(metadataBuffer, valuesBuffer);
 }
 
-//std::shared_ptr<aeron::concurrent::AtomicBuffer> valuesBuffer(const aeron::concurrent::CountersReader & value) {
-//    return std::make_shared<aeron::concurrent::AtomicBuffer>(value.valuesBuffer());
-//}
-//
-//std::shared_ptr<aeron::concurrent::AtomicBuffer> metaDataBuffer(const aeron::concurrent::CountersReader & value) {
-//    return std::make_shared<aeron::concurrent::AtomicBuffer>(value.metaDataBuffer());
-//}
-
-
-std::unique_ptr<aeron::concurrent::AtomicBuffer> valuesBuffer(const aeron::concurrent::CountersReader & value) {
-    return std::make_unique<aeron::concurrent::AtomicBuffer>(value.valuesBuffer());
+inline void getValuesBuffer(const aeron::concurrent::CountersReader & reader, const std::unique_ptr<AtomicBuffer> &buffer){
+    buffer->wrap(reader.valuesBuffer());
 }
 
-std::unique_ptr<aeron::concurrent::AtomicBuffer> metaDataBuffer(const aeron::concurrent::CountersReader & value) {
-    return std::make_unique<aeron::concurrent::AtomicBuffer>(value.metaDataBuffer());
+inline void getMetaDataBuffer(const aeron::concurrent::CountersReader & reader, const std::unique_ptr<AtomicBuffer> &buffer){
+    buffer->wrap(reader.metaDataBuffer());
+}
+
+
+inline rust::String getCounterLabel(const aeron::concurrent::CountersReader & reader, std::int32_t id){
+    return  rust::String(reader.getCounterLabel(id));
+}
+
+inline void forEach(const aeron::concurrent::CountersReader & reader, rust::Fn<void(std::int32_t, std::int32_t, aeron::concurrent::AtomicBuffer const &, const std::string&)> function) {
+    return reader.forEach(function);
 }
 
 }}}

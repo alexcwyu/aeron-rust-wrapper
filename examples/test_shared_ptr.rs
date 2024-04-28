@@ -54,6 +54,8 @@ fn test2() {
 
 
     ptr1.sayHi();
+    ptr1.as_mut().unwrap().sayHi2();
+    ptr1.as_mut().unwrap().sayHi2();
     ptr2.sayHi();
     println!("##### 2 ");
     ptr2.as_ref().unwrap().getObj1().sayHi();

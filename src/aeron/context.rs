@@ -1,4 +1,7 @@
 use std::ffi::CString;
+use std::pin::Pin;
+
+use cxx::{CxxString, UniquePtr};
 
 use crate::aeron::concurrent::counters_reader::ffi::CountersReader;
 use crate::aeron::image::ffi::Image;
@@ -245,7 +248,7 @@ fn default_on_close_client_handler() {}
 
 
 #[cxx::bridge(namespace = "aeron")]
-pub mod ffi {
+pub(crate) mod ffi {
 
     unsafe extern "C++" {
 
@@ -254,7 +257,6 @@ pub mod ffi {
         #[namespace = "aeron"]
         type Image = crate::aeron::image::ffi::Image;
 
-
         #[namespace = "aeron::concurrent"]
         type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CountersReader;
 
@@ -262,99 +264,104 @@ pub mod ffi {
 
         type Context;
 
-
-        fn conclude<'a>(self: Pin<&'a mut Context>) ->Pin<&'a mut Context>;
-
-
-        #[rust_name = "set_aeron_dir"]
-        fn aeronDir<'a>(self: Pin<&'a mut Context>, directory: & CxxString) ->Pin<&'a mut Context>;
-
-
-        #[rust_name = "set_client_name"]
-        fn clientName<'a>(self: Pin<&'a mut Context>, client_name: & CxxString) ->Pin<&'a mut Context>;
-
-
         #[rust_name = "client_name"]
         fn clientName(self: & Context) -> &CxxString;
 
-        #[rust_name = "cnc_file_name"]
-        fn cncFileName(self: &Context) -> &CxxString;
-
-        #[rust_name = "set_idle_sleep_duration"]
-        fn idleSleepDuration<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
-
         #[rust_name = "idle_sleep_duration"]
         fn idleSleepDuration(self: &Context) -> i64;
-
-
-        #[rust_name = "set_media_driver_timeout"]
-        fn mediaDriverTimeout<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
-
         #[rust_name = "media_driver_timeout"]
         fn mediaDriverTimeout(self: &Context) -> i64;
 
-        #[rust_name = "set_resource_linger_timeout"]
-        fn resourceLingerTimeout<'a>(self: Pin<&'a mut Context>, value: i64) ->Pin<&'a mut Context>;
 
-        // #[rust_name = "resource_linger_timeout"]
-        // fn resourceLingerTimeout(self: &Context) -> i64;
-
-        #[rust_name = "use_conductor_agent_invoker"]
-        fn useConductorAgentInvoker<'a>(self: Pin<&'a mut Context>, value: bool) ->Pin<&'a mut Context>;
-
-        #[rust_name = "pre_touch_mapped_memory"]
-        fn preTouchMappedMemory<'a>(self: Pin<&'a mut Context>, value: bool) ->Pin<&'a mut Context>;
-
+        include!("aeron-rust-wrapper/cxx_wrapper/Context.cpp");
 
 
         // #[rust_name = "error_handler"]
         // this_t &errorHandler(const exception_handler_t &handler)
 
+        #[namespace = "aeron::context"]
+        #[rust_name = "new_instance"]
+        fn newInstance(clientName: String) -> UniquePtr<Context>;
+
+
+        #[namespace = "aeron::context"]
+        fn conclude(context: &UniquePtr<Context>);
+        
+        #[namespace = "aeron::context"]
+        #[rust_name = "set_aeron_dir"]
+        fn aeronDir(context: &UniquePtr<Context>, directory: & CxxString);
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "set_client_name"]
+        fn clientName(context: &UniquePtr<Context>, client_name: & CxxString);
 
 
 
-        include!("aeron-rust-wrapper/cxx_wrapper/Context.cpp");
+        #[namespace = "aeron::context"]
+        #[rust_name = "set_idle_sleep_duration"]
+        fn idleSleepDuration(context: &UniquePtr<Context>, value: i64);
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "set_media_driver_timeout"]
+        fn mediaDriverTimeout(context: &UniquePtr<Context>, value: i64);
+
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "set_resource_linger_timeout"]
+        fn resourceLingerTimeout(context: &UniquePtr<Context>, value: i64);
+        
+        #[namespace = "aeron::context"]
+        #[rust_name = "use_conductor_agent_invoker"]
+        fn useConductorAgentInvoker(context: &UniquePtr<Context>, value: bool);
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "pre_touch_mapped_memory"]
+        fn preTouchMappedMemory(context: &UniquePtr<Context>, value: bool);
+        
+
         #[namespace = "aeron::context"]
         #[rust_name = "new_publication_handler"]
-        fn newPublicationHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64)->()) -> Pin<&'a mut Context>;
+        fn newPublicationHandler(context: &UniquePtr<Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64) ->());
 
         #[namespace = "aeron::context"]
         #[rust_name = "new_exclusive_publication_handler"]
-        fn newExclusivePublicationHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64) ->()) -> Pin<&'a mut Context>;
+        fn newExclusivePublicationHandler(context: &UniquePtr<Context>, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64) ->());
 
         #[namespace = "aeron::context"]
         #[rust_name = "new_subscription_handler"]
-        fn newSubscriptionHandler<'a>(context: Pin<&'a mut Context>, handler: fn(channel: &CxxString, stream_id: i32, correlation_id: i64) ->()) -> Pin<&'a mut Context>;
+        fn newSubscriptionHandler(context: &UniquePtr<Context>, handler: fn(channel: &CxxString, stream_id: i32, correlation_id: i64) ->());
 
 
         #[namespace = "aeron::context"]
         #[rust_name = "available_image_handler"]
-        fn availableImageHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut Image>) ->()) -> Pin<&'a mut Context>;
+        fn availableImageHandler(context: &UniquePtr<Context>, handler: fn(counters_reader: Pin<&mut Image>) ->());
 
 
         #[namespace = "aeron::context"]
         #[rust_name = "unavailable_image_handler"]
-        fn unavailableImageHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut Image>) ->()) -> Pin<&'a mut Context>;
+        fn unavailableImageHandler(context: &UniquePtr<Context>, handler: fn(counters_reader: Pin<&mut Image>) ->()) ;
 
 
 
         #[namespace = "aeron::context"]
         #[rust_name = "available_counter_handler"]
-        fn availableCounterHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->()) -> Pin<&'a mut Context>;
+        fn availableCounterHandler(context: &UniquePtr<Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->());
 
 
         #[namespace = "aeron::context"]
         #[rust_name = "unavailable_counter_handler"]
-        fn unavailableCounterHandler<'a>(context: Pin<&'a mut Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->()) -> Pin<&'a mut Context>;
+        fn unavailableCounterHandler(context: &UniquePtr<Context>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) ->());
 
 
         #[namespace = "aeron::context"]
         #[rust_name = "close_client_handler"]
-        fn closeClientHandler<'a>(context: Pin<&'a mut Context>, handler: fn() ->()) -> Pin<&'a mut Context>;
+        fn closeClientHandler(context: &UniquePtr<Context>, handler: fn() ->());
 
 
         #[namespace = "aeron::context"]
-        #[rust_name = "requestDriverTermination"]
+        #[rust_name = "request_driver_termination"]
         unsafe fn requestDriverTermination(directory: &CxxString, tokenBuffer: *const u8, token_length: usize) -> bool;
 
 
@@ -362,10 +369,174 @@ pub mod ffi {
         #[rust_name = "default_aeron_path"]
         fn defaultAeronPath() -> String;
 
+
         #[namespace = "aeron::context"]
-        #[rust_name = "say_hello"]
-        fn sayHello();
+        #[rust_name = "dir_name"]
+        fn dirName(context: &Context) -> String;
+
+
+        #[namespace = "aeron::context"]
+        #[rust_name = "cnc_file_name"]
+        fn cncFileName(context: &Context) -> String;
+
     }
 
-    impl SharedPtr<Context> {}
+    impl UniquePtr<Context> {}
+}
+
+unsafe impl Sync for ffi::Context {}
+unsafe impl Send for ffi::Context {}
+
+
+pub struct Context {
+    context: UniquePtr<ffi::Context>,
+}
+
+impl Context {
+    #[inline]
+    pub fn new(context: UniquePtr<ffi::Context>) -> Self {
+        Self {
+            context
+        }
+    }
+
+    #[inline]
+    pub fn new_instance(client_name: String) -> Self {
+        Self {
+            context: ffi::new_instance(client_name)
+        }
+    }
+
+    #[inline]
+    pub fn client_name(&self) -> &CxxString {
+        self.context.client_name()
+    }
+
+    #[inline]
+    pub fn idle_sleep_duration(&self) -> i64 {
+        self.context.idle_sleep_duration()
+    }
+
+    #[inline]
+    pub fn media_driver_timeout(&self) -> i64 {
+        self.context.media_driver_timeout()
+    }
+
+
+    #[inline]
+    pub fn conclude(&self) {
+        ffi::conclude(&self.context);
+    }
+
+    #[inline]
+    pub fn set_aeron_dir(&self, directory: &CxxString) {
+        ffi::set_aeron_dir(&self.context, directory);
+    }
+
+    #[inline]
+    pub fn set_client_name(&self, client_name: &CxxString) {
+        ffi::set_client_name(&self.context, client_name);
+    }
+
+    #[inline]
+    pub fn set_idle_sleep_duration(&self, value: i64) {
+        ffi::set_idle_sleep_duration(&self.context, value);
+    }
+
+    #[inline]
+    pub fn set_media_driver_timeout(&self, value: i64) {
+        ffi::set_media_driver_timeout(&self.context, value);
+    }
+
+    #[inline]
+    pub fn set_resource_linger_timeout(&self, value: i64) {
+        ffi::set_resource_linger_timeout(&self.context, value);
+    }
+
+    #[inline]
+    pub fn use_conductor_agent_invoker(&self, value: bool) {
+        ffi::use_conductor_agent_invoker(&self.context, value);
+    }
+
+    #[inline]
+    pub fn pre_touch_mapped_memory(&self, value: bool) {
+        ffi::pre_touch_mapped_memory(&self.context, value);
+    }
+
+    #[inline]
+    pub fn new_publication_handler(&self, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64)) {
+        ffi::new_publication_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn new_exclusive_publication_handler(&self, handler: fn(channel: &CxxString, stream_id: i32, session_id: i32, correlation_id: i64)) {
+        ffi::new_exclusive_publication_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn new_subscription_handler(&self, handler: fn(channel: &CxxString, stream_id: i32, correlation_id: i64)) {
+        ffi::new_subscription_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn available_image_handler(&self, handler: fn(counters_reader: Pin<&mut Image>)) {
+        ffi::available_image_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn unavailable_image_handler(&self, handler: fn(counters_reader: Pin<&mut Image>)) {
+        ffi::unavailable_image_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn available_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32)) {
+        ffi::available_counter_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn unavailable_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32)) {
+        ffi::unavailable_counter_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub fn close_client_handler(&self, handler: fn()) {
+        ffi::close_client_handler(&self.context, handler);
+    }
+
+    #[inline]
+    pub unsafe fn request_driver_termination(directory: &CxxString, token_buffer: *const u8, token_length: usize) -> bool {
+        ffi::request_driver_termination(directory, token_buffer, token_length)
+    }
+
+    #[inline]
+    pub fn default_aeron_path(&self) -> String {
+        ffi::default_aeron_path()
+    }
+
+
+    #[inline]
+    pub fn dir_name(&self) -> String {
+        ffi::dir_name(self.context.as_ref().unwrap())
+    }
+
+    #[inline]
+    pub fn cnc_file_name(&self) -> String {
+        ffi::cnc_file_name(self.context.as_ref().unwrap())
+    }
+    pub fn get_ref(&self) -> &UniquePtr<ffi::Context> {
+        &self.context
+    }
+    pub fn as_ref(&self) -> &ffi::Context {
+        self.context.as_ref().unwrap()
+    }
+    pub fn as_mut(&mut self) -> Pin<&mut ffi::Context> {
+        self.context.as_mut().unwrap()
+    }
+}
+
+
+impl From <UniquePtr<ffi::Context>> for Context{
+    fn from(context: UniquePtr<ffi::Context>) -> Self{
+        Self::new(context)
+    }
 }

@@ -21,6 +21,7 @@ m_obj2(example::Object(name+"-obj2"))
 Object2::~Object2() { std::cout << "~Object2-"<<m_name << std::endl; }
 
 void Object2::sayHi() const { std::cout << "Hi from Object2-"<<m_name << std::endl; }
+void Object2::sayHi2() { std::cout << "Hi2 from Object2-"<<m_name << std::endl; }
 
 //std::shared_ptr<Object2> createShared(const std::string & name) {
 //  return std::make_shared<Object2>(Object2(name));

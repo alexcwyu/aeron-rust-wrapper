@@ -5,6 +5,9 @@ fn main() {
     let aeron_client_path = std::path::PathBuf::from(client_dir);
     let aeron_generated_path = std::path::PathBuf::from("aeron/cppbuild/Release/generated");
     let aeron_lib_path = std::path::PathBuf::from("aeron/cppbuild/Release/lib");
+    let usr_include_path = std::path::PathBuf::from("/usr/include");
+    // let usr_include_path = std::path::PathBuf::from("/usr/include/sys");
+
 
     let aeron_client_cpps = [
         "Aeron.h",
@@ -42,7 +45,6 @@ fn main() {
         "concurrent/logbuffer/Header.cpp",
         "concurrent/logbuffer/BufferClaim.cpp",
     ].into_iter().map(|src|std::path::PathBuf::from(rust_cxx_wrapper_dir.to_owned() + "/" + src));
-
 
     let example_files = [
         "cxx_demo_src/example.cc",
@@ -84,6 +86,7 @@ fn main() {
             &aeron_client_path,
             &aeron_generated_path,
             &aeron_lib_path,
+            &usr_include_path,
         ])
         .files(aeron_client_cpps)
         .files(example_files.clone())
@@ -104,4 +107,16 @@ fn main() {
     println!("cargo:rerun-if-changed=aeron/aeron-client/src/main/cpp");
     println!("cargo:rerun-if-changed=aeron/cppbuild/Release/generated");
     println!("cargo:rerun-if-changed=aeron/cppbuild/Release/lib");
+
+    println!("cargo:rustc-link-search=native=$HOME/lib:/usr/local/lib:/usr/lib");
+
+    let libs = [
+        //"aeron_driver",
+        "aeron_client_shared",
+        //"aeron_client",
+    ];
+    for lib in libs.iter() {
+        println!("cargo:rustc-link-lib={}", lib);
+    }
+
 }

@@ -1,6 +1,6 @@
 
 #[cxx::bridge(namespace = "aeron")]
-pub mod ffi {
+pub(crate) mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
@@ -13,9 +13,6 @@ pub mod ffi {
 
         include!("aeron-rust-wrapper/cxx_wrapper/LogBuffers.cpp");
 
-        #[namespace = "aeron::logbuffers"]
-        #[rust_name = "say_hello"]
-        fn sayHello();
 
         #[namespace = "aeron::logbuffers"]
         #[rust_name = "atomic_buffer"]

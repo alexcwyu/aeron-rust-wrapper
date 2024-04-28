@@ -1,6 +1,6 @@
 
 #[cxx::bridge(namespace = "aeron::concurrent")]
-pub mod ffi {
+pub(crate) mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]

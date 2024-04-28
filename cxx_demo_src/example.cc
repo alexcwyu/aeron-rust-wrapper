@@ -15,6 +15,7 @@ std::cout << "construct Object-"<<m_name << std::endl;
 Object::~Object() { std::cout << "~Object-"<<m_name  << std::endl; }
 
 void Object::sayHi() const { std::cout << "Hi from Object-"<<m_name  << std::endl; }
+void Object::sayHi2() { std::cout << "Hi2 from Object-"<<m_name  << std::endl; }
 
 //std::shared_ptr<Object> createShared(const std::string & name) {
 //  return std::make_shared<Object>(Object(name));

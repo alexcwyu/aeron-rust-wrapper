@@ -11,6 +11,7 @@ pub mod ffi {
         fn createShared(name: &CxxString) -> SharedPtr<Object2>;
         fn createUnique(name: &CxxString) -> UniquePtr<Object2>;
         fn sayHi(self: &Object2);
+        fn sayHi2(self: Pin<&mut Object2>);
         fn getObj1(self: &Object2) -> SharedPtr<Object>;
         fn getObj1Mut(self: Pin<&mut Object2>) -> SharedPtr<Object>;
         fn getObj2(self: &Object2) -> UniquePtr<Object>;

@@ -4,8 +4,12 @@
 #include "Counter.h"
 
 namespace aeron { namespace counter{
-void sayHello() {
-    std::cout << "Hello, world from Counter!" << std::endl;
+
+inline rust::String label(const std::shared_ptr<aeron::Counter> &counter) {
+    return rust::String(counter->label());
+}
+inline void close(const std::shared_ptr<aeron::Counter> &counter){
+    counter->close();
 }
 
 }}

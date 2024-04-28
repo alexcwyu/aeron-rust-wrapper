@@ -8,5 +8,6 @@ pub mod ffi {
         fn createShared(name: &CxxString) -> SharedPtr<Object>;
         fn createUnique(name: &CxxString) -> UniquePtr<Object>;
         fn sayHi(self: &Object);
+        fn sayHi2(self: Pin<&mut Object>);
     }
 }

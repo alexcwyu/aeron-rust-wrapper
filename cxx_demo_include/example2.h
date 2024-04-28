@@ -10,6 +10,7 @@ public:
   Object2(const std::string & name);
   ~Object2();
   void sayHi() const;
+  void sayHi2();
 
   std::shared_ptr<example::Object> getObj1() const{
      return std::make_shared<example::Object>(m_obj1);

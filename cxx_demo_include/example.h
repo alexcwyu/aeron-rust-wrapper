@@ -8,6 +8,7 @@ public:
   Object(const std::string & name);
   ~Object();
   void sayHi() const;
+  void sayHi2();
 private:
   std::string m_name;
 };
