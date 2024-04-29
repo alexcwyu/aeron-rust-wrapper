@@ -1,13 +1,14 @@
 
 #[cxx::bridge(namespace = "aeron")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/LogBuffers.h");
+        #[rust_name = "CxxLogBuffers"]
         type LogBuffers;
 
 
@@ -16,9 +17,9 @@ pub(crate) mod ffi {
 
         #[namespace = "aeron::logbuffers"]
         #[rust_name = "atomic_buffer"]
-        fn atomicBuffer(log_buffers: Pin<&mut LogBuffers>, index: i32) -> UniquePtr<AtomicBuffer>;
+        fn atomicBuffer(log_buffers: Pin<&mut CxxLogBuffers>, index: i32) -> UniquePtr<CxxAtomicBuffer>;
 
     }
 
-    impl SharedPtr<LogBuffers> {}
+    impl SharedPtr<CxxLogBuffers> {}
 }

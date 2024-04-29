@@ -1,48 +1,46 @@
+use std::ops::Deref;
 use cxx::SharedPtr;
 
 #[cxx::bridge(namespace = "aeron")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
-        #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        // #[namespace = "aeron::concurrent"]
+        // type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Counter.h");
-        type Counter;
-        #[rust_name = "registration_id"]
-        fn registrationId(self: &Counter) -> i64;
-        fn state(self: &Counter) -> i32;
-        #[rust_name = "is_closed"]
-        fn isClosed(self: &Counter) -> bool;
-
-
         include!("aeron-rust-wrapper/cxx_wrapper/Counter.cpp");
 
-        #[namespace = "aeron::counter"]
-        fn close(publication: &SharedPtr<Counter>);
+        #[rust_name = "CxxCounter"]
+        type Counter;
+        #[rust_name = "registration_id"]
+        fn registrationId(self: &CxxCounter) -> i64;
+        fn state(self: &CxxCounter) -> i32;
+        #[rust_name = "is_closed"]
+        fn isClosed(self: &CxxCounter) -> bool;
 
         #[namespace = "aeron::counter"]
-        fn label(publication: &SharedPtr<Counter>) -> String;
+        fn close(publication: &SharedPtr<CxxCounter>);
 
-
+        #[namespace = "aeron::counter"]
+        fn label(publication: &SharedPtr<CxxCounter>) -> String;
     }
-
-    impl SharedPtr<Counter> {}
+    impl SharedPtr<CxxCounter> {}
 }
 
 
-unsafe impl Sync for ffi::Counter {}
-unsafe impl Send for ffi::Counter {}
+unsafe impl Sync for ffi::CxxCounter {}
+unsafe impl Send for ffi::CxxCounter {}
 
 #[derive(Clone)]
 pub struct Counter {
-    counter: SharedPtr<ffi::Counter>,
+    counter: SharedPtr<ffi::CxxCounter>,
 }
 
 impl Counter {
     #[inline]
-    pub fn new(counter: SharedPtr<ffi::Counter>) -> Self {
+    pub fn new(counter: SharedPtr<ffi::CxxCounter>) -> Self {
         Self {
             counter
         }
@@ -73,14 +71,21 @@ impl Counter {
         ffi::label(&self.counter)
     }
 
-    pub fn get_ref(&self) -> &SharedPtr<ffi::Counter> {
+    pub fn get_ref(&self) -> &SharedPtr<ffi::CxxCounter> {
         &self.counter
     }
 }
 
+impl Deref for Counter {
+    type Target = ffi::CxxCounter;
 
-impl From <SharedPtr<ffi::Counter>> for Counter{
-    fn from(counter: SharedPtr<ffi::Counter>) -> Self{
+    fn deref(&self) -> &Self::Target {
+        &self.counter.as_ref().unwrap()
+    }
+}
+
+impl From <SharedPtr<ffi::CxxCounter>> for Counter{
+    fn from(counter: SharedPtr<ffi::CxxCounter>) -> Self{
         Self::new(counter)
     }
 }

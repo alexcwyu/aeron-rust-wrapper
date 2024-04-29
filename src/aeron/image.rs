@@ -2,118 +2,115 @@ use std::ops::Deref;
 
 use cxx::SharedPtr;
 
-use crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
-use crate::aeron::concurrent::logbuffer::header::ffi::Header;
-use crate::aeron::image::ffi::ControlledPollAction;
+use crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+use crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
+use crate::aeron::image::ffi::{CxxControlledPollAction, CxxImage};
 
 #[cxx::bridge(namespace = "aeron")]
 pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
         #[namespace = "aeron::concurrent::logbuffer"]
-        type Header = crate::aeron::concurrent::logbuffer::header::ffi::Header;
-        #[namespace = "aeron"]
-        type LogBuffers = crate::aeron::log_buffers::ffi::LogBuffers;
+        type CxxHeader = crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Image.h");
 
+        include!("aeron-rust-wrapper/cxx_wrapper/Image.cpp");
+
+
+        #[rust_name = "CxxImage"]
         type Image;
 
+        #[rust_name = "CxxControlledPollAction"]
         type ControlledPollAction;
 
         #[rust_name = "term_buffer_length"]
-        fn termBufferLength(self: &Image) -> i32;
+        fn termBufferLength(self: &CxxImage) -> i32;
 
         #[rust_name = "position_bits_to_shift"]
-        fn positionBitsToShift(self: &Image) -> i32;
+        fn positionBitsToShift(self: &CxxImage) -> i32;
 
         #[rust_name = "session_id"]
-        fn sessionId(self: &Image) -> i32;
+        fn sessionId(self: &CxxImage) -> i32;
 
         #[rust_name = "correlation_id"]
-        fn correlationId(self: &Image) -> i64;
+        fn correlationId(self: &CxxImage) -> i64;
 
         #[rust_name = "subscription_registration_id"]
-        fn subscriptionRegistrationId(self: &Image) -> i64;
+        fn subscriptionRegistrationId(self: &CxxImage) -> i64;
 
         #[rust_name = "join_position"]
-        fn joinPosition(self: &Image) -> i64;
+        fn joinPosition(self: &CxxImage) -> i64;
 
         #[rust_name = "initial_term_id"]
-        fn initialTermId(self: &Image) -> i32;
+        fn initialTermId(self: &CxxImage) -> i32;
 
         #[rust_name = "is_closed"]
-        fn isClosed(self: &Image) -> bool;
-        fn position(self: &Image) -> i64;
+        fn isClosed(self: &CxxImage) -> bool;
+        fn position(self: &CxxImage) -> i64;
 
         #[rust_name = "subscriber_position_id"]
-        fn subscriberPositionId(self: &Image) -> i32;
+        fn subscriberPositionId(self: &CxxImage) -> i32;
 
         #[rust_name = "is_end_of_stream"]
-        fn isEndOfStream(self: &Image) -> bool;
+        fn isEndOfStream(self: &CxxImage) -> bool;
 
         #[rust_name = "end_of_stream_position"]
-        fn endOfStreamPosition(self: &Image) -> i64;
+        fn endOfStreamPosition(self: &CxxImage) -> i64;
 
         #[rust_name = "active_transport_count"]
-        fn activeTransportCount(self: &Image) -> i32;
-
-        //std::string sourceIdentity() const
-
-
-        include!("aeron-rust-wrapper/cxx_wrapper/Image.cpp");
-
+        fn activeTransportCount(self: &CxxImage) -> i32;
         #[namespace = "aeron::image"]
         #[rust_name = "source_identity"]
-        fn sourceIdentity(publication: &SharedPtr<Image>) -> String;
+        fn sourceIdentity(publication: &SharedPtr<CxxImage>) -> String;
         #[namespace = "aeron::image"]
         #[rust_name = "set_position"]
-        fn position(publication: &SharedPtr<Image>, newPosition: i64);
+        fn position(publication: &SharedPtr<CxxImage>, newPosition: i64);
         #[namespace = "aeron::image"]
-        fn close(publication: &SharedPtr<Image>);
+        fn close(publication: &SharedPtr<CxxImage>);
         #[namespace = "aeron::image"]
-        fn poll(publication: &SharedPtr<Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), fragmentLimit: i32) -> i32;
+        fn poll(publication: &SharedPtr<CxxImage>, fragmentHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> (), fragmentLimit: i32) -> i32;
 
         #[namespace = "aeron::image"]
         #[rust_name = "bounded_poll"]
-        fn boundedPoll(publication: &SharedPtr<Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), limitPosition: i64, fragmentLimit: i32) -> i32;
+        fn boundedPoll(publication: &SharedPtr<CxxImage>, fragmentHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> (), limitPosition: i64, fragmentLimit: i32) -> i32;
 
         #[namespace = "aeron::image"]
         #[rust_name = "controlled_poll"]
-        fn controlledPoll(publication: &SharedPtr<Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, fragmentLimit: i32) -> i32;
+        fn controlledPoll(publication: &SharedPtr<CxxImage>, fragmentHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, fragmentLimit: i32) -> i32;
 
         #[namespace = "aeron::image"]
         #[rust_name = "bounded_controlled_poll"]
-        fn boundedControlledPoll(publication: &SharedPtr<Image>, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64, fragmentLimit: i32) -> i32;
+        fn boundedControlledPoll(publication: &SharedPtr<CxxImage>, fragmentHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, limitPosition: i64, fragmentLimit: i32) -> i32;
 
         #[namespace = "aeron::image"]
         #[rust_name = "controlled_peek"]
-        fn controlledPeek(publication: &SharedPtr<Image>, initialPosition: i64, fragmentHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limitPosition: i64) -> i64;
+        fn controlledPeek(publication: &SharedPtr<CxxImage>, initialPosition: i64, fragmentHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, limitPosition: i64) -> i64;
 
         #[namespace = "aeron::image"]
         #[rust_name = "block_poll"]
-        fn blockPoll(publication: &SharedPtr<Image>, blockHandler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, sessionId: i32, termId: i32) -> (), blockLengthLimit: i32) -> i32;
+        fn blockPoll(publication: &SharedPtr<CxxImage>, blockHandler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, sessionId: i32, termId: i32) -> (), blockLengthLimit: i32) -> i32;
 
     }
 
-    impl SharedPtr<Image> {}
+    impl SharedPtr<CxxImage> {}
 }
 
 
-unsafe impl Sync for ffi::Image {}
-unsafe impl Send for ffi::Image {}
+unsafe impl Sync for ffi::CxxImage {}
+unsafe impl Send for ffi::CxxImage {}
 
 
 #[derive(Clone)]
 pub struct Image {
-    image: SharedPtr<ffi::Image>,
+    image: SharedPtr<ffi::CxxImage>,
 }
 
 impl Image {
     #[inline]
-    pub fn new(image: SharedPtr<ffi::Image>) -> Self {
+    pub fn new(image: SharedPtr<ffi::CxxImage>) -> Self {
         Self {
             image
         }
@@ -200,43 +197,51 @@ impl Image {
     }
 
     #[inline]
-    pub fn poll(&self, fragment_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), fragment_limit: i32) -> i32 {
+    pub fn poll(&self, fragment_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> (), fragment_limit: i32) -> i32 {
         ffi::poll(&self.image, fragment_handler, fragment_limit)
     }
 
     #[inline]
-    pub fn bounded_poll(&self, fragment_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> (), limit_position: i64, fragment_limit: i32) -> i32 {
+    pub fn bounded_poll(&self, fragment_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> (), limit_position: i64, fragment_limit: i32) -> i32 {
         ffi::bounded_poll(&self.image, fragment_handler, limit_position, fragment_limit)
     }
 
     #[inline]
-    pub fn controlled_poll(&self, fragment_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, fragment_limit: i32) -> i32 {
+    pub fn controlled_poll(&self, fragment_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, fragment_limit: i32) -> i32 {
         ffi::controlled_poll(&self.image, fragment_handler, fragment_limit)
     }
 
     #[inline]
-    pub fn bounded_controlled_poll(&self, fragment_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limit_position: i64, fragment_limit: i32) -> i32 {
+    pub fn bounded_controlled_poll(&self, fragment_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, limit_position: i64, fragment_limit: i32) -> i32 {
         ffi::bounded_controlled_poll(&self.image, fragment_handler, limit_position, fragment_limit)
     }
 
     #[inline]
-    pub fn controlled_peek(&self, initial_position: i64, fragment_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, header: &Header) -> ControlledPollAction, limit_position: i64) -> i64 {
+    pub fn controlled_peek(&self, initial_position: i64, fragment_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, header: &CxxHeader) -> CxxControlledPollAction, limit_position: i64) -> i64 {
         ffi::controlled_peek(&self.image, initial_position, fragment_handler, limit_position)
     }
 
     #[inline]
-    pub fn block_poll(&self, block_handler: fn(buffer: &AtomicBuffer, offset: i32, length: i32, session_id: i32, term_id: i32) -> (), block_length_limit: i32) -> i32 {
+    pub fn block_poll(&self, block_handler: fn(buffer: &CxxAtomicBuffer, offset: i32, length: i32, session_id: i32, term_id: i32) -> (), block_length_limit: i32) -> i32 {
         ffi::block_poll(&self.image, block_handler, block_length_limit)
     }
 
-    pub fn get_ref(&self) -> &SharedPtr<ffi::Image> {
+    pub fn get_ref(&self) -> &SharedPtr<CxxImage> {
         &self.image
     }
 }
 
 
-impl From <SharedPtr<ffi::Image>> for Image{
-    fn from(image: SharedPtr<ffi::Image>) -> Self{
+impl Deref for Image {
+    type Target = CxxImage;
+
+    fn deref(&self) -> &Self::Target {
+        &self.image.as_ref().unwrap()
+    }
+}
+
+impl From <SharedPtr<CxxImage>> for Image{
+    fn from(image: SharedPtr<CxxImage>) -> Self{
         Self::new(image)
     }
 }

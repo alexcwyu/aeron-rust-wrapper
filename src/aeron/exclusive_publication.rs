@@ -1,152 +1,138 @@
+use std::ops::Deref;
 use std::pin::Pin;
 
 use cxx::{CxxVector, SharedPtr};
 
-use crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
-use crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+use crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+use crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
 #[cxx::bridge(namespace = "aeron")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
         #[namespace = "aeron::concurrent::logbuffer"]
-        type BufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+        type CxxBufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ExclusivePublication.h");
+        include!("aeron-rust-wrapper/cxx_wrapper/ExclusivePublication.cpp");
 
+        #[rust_name = "CxxExclusivePublication"]
         type ExclusivePublication;
 
         #[rust_name = "stream_id"]
-        fn streamId(self: &ExclusivePublication) -> i32;
+        fn streamId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "session_id"]
-        fn sessionId(self: &ExclusivePublication) -> i32;
+        fn sessionId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "initial_term_id"]
-        fn initialTermId(self: &ExclusivePublication) -> i32;
+        fn initialTermId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "term_id"]
-        fn termId(self: &ExclusivePublication) -> i32;
+        fn termId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "term_offset"]
-        fn termOffset(self: &ExclusivePublication) -> i32;
+        fn termOffset(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "original_registration_id"]
-        fn originalRegistrationId(self: &ExclusivePublication) -> i64;
+        fn originalRegistrationId(self: &CxxExclusivePublication) -> i64;
 
         #[rust_name = "registration_id"]
-        fn registrationId(self: &ExclusivePublication) -> i64;
+        fn registrationId(self: &CxxExclusivePublication) -> i64;
 
         #[rust_name = "max_message_length"]
-        fn maxMessageLength(self: &ExclusivePublication) -> i32;
+        fn maxMessageLength(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "max_payload_length"]
-        fn maxPayloadLength(self: &ExclusivePublication) -> i32;
+        fn maxPayloadLength(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "term_buffer_length"]
-        fn termBufferLength(self: &ExclusivePublication) -> i32;
+        fn termBufferLength(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "position_bits_to_shift"]
-        fn positionBitsToShift(self: &ExclusivePublication) -> i32;
+        fn positionBitsToShift(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "is_connected"]
-        fn isConnected(self: &ExclusivePublication) -> bool;
+        fn isConnected(self: &CxxExclusivePublication) -> bool;
 
         #[rust_name = "is_closed"]
-        fn isClosed(self: &ExclusivePublication) -> bool;
+        fn isClosed(self: &CxxExclusivePublication) -> bool;
 
         #[rust_name = "max_possible_position"]
-        fn maxPossiblePosition(self: &ExclusivePublication) -> i64;
-        fn position(self: &ExclusivePublication) -> i64;
+        fn maxPossiblePosition(self: &CxxExclusivePublication) -> i64;
+        fn position(self: &CxxExclusivePublication) -> i64;
 
         #[rust_name = "publication_limit"]
-        fn publicationLimit(self: &ExclusivePublication) -> i64;
+        fn publicationLimit(self: &CxxExclusivePublication) -> i64;
 
         #[rust_name = "publication_limit_id"]
-        fn publicationLimitId(self: &ExclusivePublication) -> i32;
+        fn publicationLimitId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "available_window"]
-        fn availableWindow(self: &ExclusivePublication) -> i64;
+        fn availableWindow(self: &CxxExclusivePublication) -> i64;
 
         #[rust_name = "channel_status_id"]
-        fn channelStatusId(self: &ExclusivePublication) -> i32;
+        fn channelStatusId(self: &CxxExclusivePublication) -> i32;
 
         #[rust_name = "channel_status"]
-        fn channelStatus(self: &ExclusivePublication) -> i64;
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer, util::index_t offset, util::index_t length, const on_reserved_value_supplier_t &reservedValueSupplier)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer, util::index_t offset, util::index_t length)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer &buffer)
-
-        //template<class BufferIterator> std::int64_t offer(BufferIterator startBuffer, BufferIterator lastBuffer, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //std::int64_t offer(const concurrent::AtomicBuffer buffers[], std::size_t length, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //template<std::size_t N> std::int64_t offer(const std::array<concurrent::AtomicBuffer, N> &buffers, const on_reserved_value_supplier_t &reservedValueSupplier = DEFAULT_RESERVED_VALUE_SUPPLIER)
-
-        //std::int64_t tryClaim(util::index_t length, concurrent::logbuffer::BufferClaim &bufferClaim)
-
-        include!("aeron-rust-wrapper/cxx_wrapper/ExclusivePublication.cpp");
-
+        fn channelStatus(self: &CxxExclusivePublication) -> i64;
         #[namespace = "aeron::exclusive_publication"]
-        fn channel(publication: &SharedPtr<ExclusivePublication>) -> String;
+        fn channel(publication: &SharedPtr<CxxExclusivePublication>) -> String;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "add_destination"]
-        fn addDestination(publication: &SharedPtr<ExclusivePublication>, endpoint_channel: String) ->i64;
+        fn addDestination(publication: &SharedPtr<CxxExclusivePublication>, endpoint_channel: String) ->i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "remove_destination"]
-        fn removeDestination(publication: &SharedPtr<ExclusivePublication>, endpoint_channel: String) ->i64;
+        fn removeDestination(publication: &SharedPtr<CxxExclusivePublication>, endpoint_channel: String) ->i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "find_destination_response"]
-        fn findDestinationResponse(publication: &SharedPtr<ExclusivePublication>, correlation_id: i64) -> bool;
+        fn findDestinationResponse(publication: &SharedPtr<CxxExclusivePublication>, correlation_id: i64) -> bool;
 
         #[namespace = "aeron::exclusive_publication"]
-        fn close(publication: &SharedPtr<ExclusivePublication>);
+        fn close(publication: &SharedPtr<CxxExclusivePublication>);
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "offer_part"]
-        fn offer(publication: &SharedPtr<ExclusivePublication>, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64;
+        fn offer(publication: &SharedPtr<CxxExclusivePublication>, buffer: &CxxAtomicBuffer, offset: i32, length: i32) -> i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "offer"]
-        fn offer(publication: &SharedPtr<ExclusivePublication>, buffer: &AtomicBuffer) -> i64;
+        fn offer(publication: &SharedPtr<CxxExclusivePublication>, buffer: &CxxAtomicBuffer) -> i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "try_claim"]
-        fn tryClaim(publication: &SharedPtr<ExclusivePublication>, length: i32, bufferClaim : Pin<&mut BufferClaim>) ->i64;
+        fn tryClaim(publication: &SharedPtr<CxxExclusivePublication>, length: i32, bufferClaim : Pin<&mut CxxBufferClaim>) ->i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "offer_opt"]
-        fn offer(publication: &SharedPtr<ExclusivePublication>, buffer: &AtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+        fn offer(publication: &SharedPtr<CxxExclusivePublication>, buffer: &CxxAtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
 
         #[namespace = "aeron::exclusive_publication"]
         #[rust_name = "offer_bulk"]
-        fn offer(publication: &SharedPtr<ExclusivePublication>, buffer: &CxxVector<AtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+        fn offer(publication: &SharedPtr<CxxExclusivePublication>, buffer: &CxxVector<CxxAtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
 
     }
 
-    impl SharedPtr<ExclusivePublication> {}
+    impl SharedPtr<CxxExclusivePublication> {}
 }
 
 
-unsafe impl Sync for ffi::ExclusivePublication {}
-unsafe impl Send for ffi::ExclusivePublication {}
+unsafe impl Sync for ffi::CxxExclusivePublication {}
+unsafe impl Send for ffi::CxxExclusivePublication {}
 #[derive(Clone)]
 pub struct ExclusivePublication {
-    publication: SharedPtr<ffi::ExclusivePublication>,
+    publication: SharedPtr<ffi::CxxExclusivePublication>,
 }
 
 impl ExclusivePublication {
     #[inline]
-    pub fn new(publication: SharedPtr<ffi::ExclusivePublication>) -> Self {
+    pub fn new(publication: SharedPtr<ffi::CxxExclusivePublication>) -> Self {
         Self {
             publication
         }
@@ -273,38 +259,45 @@ impl ExclusivePublication {
     }
 
     #[inline]
-    pub fn offer_part(&self, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64 {
+    pub fn offer_part(&self, buffer: &CxxAtomicBuffer, offset: i32, length: i32) -> i64 {
         ffi::offer_part(&self.publication, buffer, offset, length)
     }
 
     #[inline]
-    pub fn offer(&self, buffer: &AtomicBuffer) -> i64 {
+    pub fn offer(&self, buffer: &CxxAtomicBuffer) -> i64 {
         ffi::offer(&self.publication, buffer)
     }
 
     #[inline]
-    pub fn try_claim(&self, length: i32, buffer_claim: Pin<&mut BufferClaim>) -> i64 {
+    pub fn try_claim(&self, length: i32, buffer_claim: Pin<&mut CxxBufferClaim>) -> i64 {
         ffi::try_claim(&self.publication, length, buffer_claim)
     }
 
     #[inline]
-    pub fn offer_opt(&self, buffer: &AtomicBuffer, offset: i32, length: i32, reserved_value_supplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
+    pub fn offer_opt(&self, buffer: &CxxAtomicBuffer, offset: i32, length: i32, reserved_value_supplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
         ffi::offer_opt(&self.publication, buffer, offset, length, reserved_value_supplier)
     }
 
     #[inline]
-    pub fn offer_bulk(&self, buffer: &CxxVector<AtomicBuffer>, reserved_value_supplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
+    pub fn offer_bulk(&self, buffer: &CxxVector<CxxAtomicBuffer>, reserved_value_supplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
         ffi::offer_bulk(&self.publication, buffer, reserved_value_supplier)
     }
 
-    pub fn get_ref(&self) -> &SharedPtr<ffi::ExclusivePublication> {
+    pub fn get_ref(&self) -> &SharedPtr<ffi::CxxExclusivePublication> {
         &self.publication
     }
 }
 
+impl Deref for ExclusivePublication {
+    type Target = ffi::CxxExclusivePublication;
 
-impl From <SharedPtr<ffi::ExclusivePublication>> for ExclusivePublication{
-    fn from(publication: SharedPtr<ffi::ExclusivePublication>) -> Self{
+    fn deref(&self) -> &Self::Target {
+        &self.publication.as_ref().unwrap()
+    }
+}
+
+impl From <SharedPtr<ffi::CxxExclusivePublication>> for ExclusivePublication{
+    fn from(publication: SharedPtr<ffi::CxxExclusivePublication>) -> Self{
         Self::new(publication)
     }
 }

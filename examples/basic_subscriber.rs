@@ -44,7 +44,7 @@ fn parse_cmd_line() -> Settings {
     Settings::new()
 }
 
-fn available_image_handler(image: Pin<& mut image::ffi::Image>) {
+fn available_image_handler(image: Pin<& mut image::ffi::CxxImage>) {
     println!(
         "Available image correlation_id={} session_id={} at position={}",
         image.correlation_id(),
@@ -53,7 +53,7 @@ fn available_image_handler(image: Pin<& mut image::ffi::Image>) {
     );
 }
 
-fn unavailable_image_handler(image: Pin<& mut image::ffi::Image>) {
+fn unavailable_image_handler(image: Pin<& mut image::ffi::CxxImage>) {
     println!(
         "Unavailable image correlation_id={} session_id={} at position={}",
         image.correlation_id(),
@@ -63,8 +63,19 @@ fn unavailable_image_handler(image: Pin<& mut image::ffi::Image>) {
 }
 
 
-fn on_new_fragment(buffer: &atomic_buffer::ffi::AtomicBuffer, offset: i32, length: i32, header: & header::ffi::Header){
+fn str_to_c(val: &str) -> CString {
+    CString::new(val).expect("Error converting str to CString")
+}
+
+fn on_new_fragment(buffer: &atomic_buffer::ffi::CxxAtomicBuffer, offset: i32, length: i32, header: & header::ffi::CxxHeader){
     unsafe {
+        // println!(
+        //     "Message to stream {} from session {} ({}@{})",
+        //     header.stream_id(),
+        //     header.session_id(),
+        //     length,
+        //     offset
+        // );
         let slice_msg = slice::from_raw_parts_mut(buffer.buffer().offset(offset as isize), length as usize);
         let msg = CString::new(slice_msg).unwrap();
         println!(
@@ -76,10 +87,6 @@ fn on_new_fragment(buffer: &atomic_buffer::ffi::AtomicBuffer, offset: i32, lengt
             msg.to_str().unwrap()
         );
     }
-}
-
-fn str_to_c(val: &str) -> CString {
-    CString::new(val).expect("Error converting str to CString")
 }
 
 fn main() {
@@ -94,24 +101,17 @@ fn main() {
 
     println!("Subscribing Pong at {} on Stream ID {}", settings.channel, settings.stream_id);
 
-    let mut context = context::Context::new_instance("test".to_string());
+    let mut context = context::Context::new_instance("test");
     //let mut context = aeron_rust_wrapper::aeron::context::ffi::new_instance("test".to_string());
 
 
-    // println!("setting prefix");
-    // if !settings.dir_prefix.is_empty() {
-    //     let_cxx_string!(dir_prefix = settings.dir_prefix);
-    //     context.as_mut().unwrap().set_aeron_dir(&dir_prefix);
-    // }
-// else{
-//     let_cxx_string!(dir_prefix = "/dev/shm/aeron-rust-test");
-//     context.as_mut().unwrap().set_aeron_dir(&dir_prefix);
-// }
+    println!("setting prefix");
+    if !settings.dir_prefix.is_empty() {
+        context.set_aeron_dir(&settings.dir_prefix);
+    }
 
     println!("Using CnC file: {}", context.cnc_file_name());
     println!("client name: {}",context.client_name());
-
-
 
 
     println!("new_subscription_handler");
@@ -138,7 +138,7 @@ fn main() {
 
     SUBSCRIPTION_ID.store(subscription_id, Ordering::SeqCst);
 
-    println!("finding subscription");
+    println!("find_subscription");
     let mut subscription = aeron.find_subscription(subscription_id);
 
     while subscription.is_null() ||!subscription.is_connected() {
@@ -155,10 +155,3 @@ fn main() {
         idle_strategy.idle_opt(fragments_read);
     }
 }
-// fn convert_mut<T>(reference: &T) -> &mut T {
-//     unsafe {
-//         let const_ptr = reference as *const T;
-//         let mut_ptr = const_ptr as *mut T;
-//         &mut *mut_ptr
-//     }
-// }

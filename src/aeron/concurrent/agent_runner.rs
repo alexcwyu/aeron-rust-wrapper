@@ -1,13 +1,15 @@
 
 #[cxx::bridge(namespace = "aeron::concurrent")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/AgentRunner.h");
+
+        #[rust_name = "CxxAgentRunner"]
         type AgentRunner;
 
         // fn name(self: &AgentRunner) -> &CxxString;

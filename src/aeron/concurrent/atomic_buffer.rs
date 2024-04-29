@@ -1,6 +1,8 @@
+use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 
 use cxx::{CxxString, ExternType, UniquePtr};
+use crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
 #[cxx::bridge(namespace = "aeron::concurrent")]
 pub mod ffi{
@@ -10,96 +12,97 @@ pub mod ffi{
     unsafe extern "C++" {
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/AtomicBuffer.h");
 
-
+        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/AtomicBuffer.cpp");
+        #[rust_name = "CxxAtomicBuffer"]
         type AtomicBuffer;
 
         fn capacity(&self) -> i32;
 
 
         #[rust_name = "set_capacity"]
-        fn capacity(self: Pin<&mut AtomicBuffer>, length: usize);
+        fn capacity(self: Pin<&mut CxxAtomicBuffer>, length: usize);
 
         fn buffer(&self) -> *mut u8;
 
 
         #[rust_name = "put_i32"]
-        fn putInt32(self: Pin<&mut AtomicBuffer>, offset: i32, value: i32);
+        fn putInt32(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i32);
         #[rust_name = "get_i32"]
         fn getInt32(&self, offset: i32) -> i32;
 
         #[rust_name = "put_i64"]
-        fn putInt64(self: Pin<&mut AtomicBuffer>, offset: i32, value: i64);
+        fn putInt64(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i64);
 
         #[rust_name = "get_i64"]
         fn getInt64(&self, offset: i32) -> i64;
 
         #[rust_name = "put_i16"]
-        fn putInt16(self: Pin<&mut AtomicBuffer>, offset: i32, value: i16);
+        fn putInt16(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i16);
 
         #[rust_name = "get_i16"]
         fn getInt16(&self, offset: i32) -> i16;
 
         #[rust_name = "put_u16"]
-        fn putUInt16(self: Pin<&mut AtomicBuffer>, offset: i32, value: u16);
+        fn putUInt16(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: u16);
 
         #[rust_name = "get_u16"]
         fn getUInt16(&self, offset: i32) -> u16;
 
         #[rust_name = "put_u8"]
-        fn putUInt8(self: Pin<&mut AtomicBuffer>, offset: i32, value: u8);
+        fn putUInt8(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: u8);
 
         #[rust_name = "get_u8"]
         fn getUInt8(&self, offset: i32) -> u8;
 
 
         #[rust_name = "put_i32_ordered"]
-        fn putInt32Ordered(self: Pin<&mut AtomicBuffer>, offset: i32, value: i32);
+        fn putInt32Ordered(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i32);
         #[rust_name = "get_i32_volatile"]
         fn getInt32Volatile(&self, offset: i32) -> i32;
 
         #[rust_name = "put_i64_ordered"]
-        fn putInt64Ordered(self: Pin<&mut AtomicBuffer>, offset: i32, value: i64);
+        fn putInt64Ordered(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i64);
 
         #[rust_name = "get_i64_volatile"]
         fn getInt64Volatile(&self, offset: i32) -> i64;
 
         #[rust_name = "put_i32_atomic"]
-        fn putInt32Atomic(self: Pin<&mut AtomicBuffer>, offset: i32, value: i32);
+        fn putInt32Atomic(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i32);
         #[rust_name = "put_i64_atomic"]
-        fn putInt64Atomic(self: Pin<&mut AtomicBuffer>, offset: i32, value: i64);
+        fn putInt64Atomic(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i64);
 
         #[rust_name = "add_i64_ordered"]
-        fn addInt64Ordered(self: Pin<&mut AtomicBuffer>, offset: i32, delta: i64);
+        fn addInt64Ordered(self: Pin<&mut CxxAtomicBuffer>, offset: i32, delta: i64);
 
         #[rust_name = "compare_and_set_i64"]
-        fn compareAndSetInt64(self: Pin<&mut AtomicBuffer>, offset: i32, expected_value: i64, update_value: i64) -> bool;
+        fn compareAndSetInt64(self: Pin<&mut CxxAtomicBuffer>, offset: i32, expected_value: i64, update_value: i64) -> bool;
 
         #[rust_name = "get_and_set_i64"]
-        fn getAndSetInt64(self: Pin<&mut AtomicBuffer>, offset: i32, value: i64) -> i64;
+        fn getAndSetInt64(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i64) -> i64;
 
         #[rust_name = "get_and_set_i32"]
-        fn getAndSetInt32(self: Pin<&mut AtomicBuffer>, offset: i32, value: i32) -> i32;
+        fn getAndSetInt32(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: i32) -> i32;
 
         #[rust_name = "get_and_add_i64"]
-        fn getAndAddInt64(self: Pin<&mut AtomicBuffer>, offset: i32, delta: i64) -> i64;
+        fn getAndAddInt64(self: Pin<&mut CxxAtomicBuffer>, offset: i32, delta: i64) -> i64;
 
         #[rust_name = "add_i32_ordered"]
-        fn addInt32Ordered(self: Pin<&mut AtomicBuffer>, offset: i32, delta: i32);
+        fn addInt32Ordered(self: Pin<&mut CxxAtomicBuffer>, offset: i32, delta: i32);
 
         #[rust_name = "compare_and_set_i32"]
-        fn compareAndSetInt32(self: Pin<&mut AtomicBuffer>, offset: i32, expected_value: i32, update_value: i32) -> bool;
+        fn compareAndSetInt32(self: Pin<&mut CxxAtomicBuffer>, offset: i32, expected_value: i32, update_value: i32) -> bool;
 
         #[rust_name = "get_and_add_i32"]
-        fn getAndAddInt32(self: Pin<&mut AtomicBuffer>, offset: i32, delta: i32) -> i32;
+        fn getAndAddInt32(self: Pin<&mut CxxAtomicBuffer>, offset: i32, delta: i32) -> i32;
 
         #[rust_name = "put_bytes_from_buffer"]
-        fn putBytes(self: Pin<&mut AtomicBuffer>, index: i32, srcBuffer: &AtomicBuffer, srcIndex: i32, length: i32);
+        fn putBytes(self: Pin<&mut CxxAtomicBuffer>, index: i32, srcBuffer: &CxxAtomicBuffer, srcIndex: i32, length: i32);
 
         #[rust_name = "put_bytes"]
-        unsafe fn putBytes(self: Pin<&mut AtomicBuffer>, index: i32, srcBuffer: *const u8, length: i32);
+        unsafe fn putBytes(self: Pin<&mut CxxAtomicBuffer>, index: i32, srcBuffer: *const u8, length: i32);
 
         #[rust_name = "set_memory"]
-        fn setMemory(self: Pin<&mut AtomicBuffer>, offset: i32, length: usize, value: u8);
+        fn setMemory(self: Pin<&mut CxxAtomicBuffer>, offset: i32, length: usize, value: u8);
 
         #[rust_name = "get_bytes"]
         unsafe fn getBytes(&self, index: i32, dst: *mut u8, length: i32);
@@ -109,49 +112,47 @@ pub mod ffi{
         fn getStringLength(&self, offset: i32) -> i32;
 
         #[rust_name = "put_string"]
-        fn putString(self: Pin<&mut AtomicBuffer>, offset: i32, value: &CxxString) -> i32;
+        fn putString(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: &CxxString) -> i32;
 
         #[rust_name = "put_string_without_length"]
-        fn putStringWithoutLength(self: Pin<&mut AtomicBuffer>, offset: i32, value: &CxxString) -> i32;
-
-        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/AtomicBuffer.cpp");
+        fn putStringWithoutLength(self: Pin<&mut CxxAtomicBuffer>, offset: i32, value: &CxxString) -> i32;
 
         #[namespace = "aeron::concurrent::atomic_buffer"]
         #[rust_name = "new_instance"]
-        unsafe fn newInstance(buffer: *mut u8, length: usize) -> UniquePtr<AtomicBuffer>;
+        unsafe fn newInstance(buffer: *mut u8, length: usize) -> UniquePtr<CxxAtomicBuffer>;
 
         #[namespace = "aeron::concurrent::atomic_buffer"]
         #[rust_name = "wrap_atomic_buffer"]
-        fn wrapAtomicBuffer(buffer : &AtomicBuffer) -> UniquePtr<AtomicBuffer>;
+        fn wrapAtomicBuffer(buffer : &CxxAtomicBuffer) -> UniquePtr<CxxAtomicBuffer>;
 
         #[namespace = "aeron::concurrent::atomic_buffer"]
         #[rust_name = "get_string"]
-        fn getString(buffer : &AtomicBuffer, offset: i32) -> String;
+        fn getString(buffer : &CxxAtomicBuffer, offset: i32) -> String;
 
         #[namespace = "aeron::concurrent::atomic_buffer"]
         #[rust_name = "get_string_without_length"]
-        fn getStringWithoutLength(buffer : &AtomicBuffer, offset: i32, length: usize) -> String;
+        fn getStringWithoutLength(buffer : &CxxAtomicBuffer, offset: i32, length: usize) -> String;
 
 
     }
 
-    impl SharedPtr<AtomicBuffer> {}
-    impl UniquePtr<AtomicBuffer> {}
+    impl SharedPtr<CxxAtomicBuffer> {}
+    impl UniquePtr<CxxAtomicBuffer> {}
 
 
 }
 
-unsafe impl Sync for ffi::AtomicBuffer {}
-unsafe impl Send for ffi::AtomicBuffer {}
+unsafe impl Sync for ffi::CxxAtomicBuffer {}
+unsafe impl Send for ffi::CxxAtomicBuffer {}
 
 
 pub struct AtomicBuffer {
-    atomic_buffer: UniquePtr<ffi::AtomicBuffer>,
+    atomic_buffer: UniquePtr<ffi::CxxAtomicBuffer>,
 }
 
 impl AtomicBuffer {
     #[inline]
-    pub fn new(atomic_buffer: UniquePtr<ffi::AtomicBuffer>) -> Self {
+    pub fn new(atomic_buffer: UniquePtr<ffi::CxxAtomicBuffer>) -> Self {
         Self {
             atomic_buffer
         }
@@ -166,7 +167,7 @@ impl AtomicBuffer {
     }
 
     #[inline]
-    pub fn wrap_atomic_buffer(buffer: &ffi::AtomicBuffer) -> Self {
+    pub fn wrap_atomic_buffer(buffer: &ffi::CxxAtomicBuffer) -> Self {
         Self {
             atomic_buffer: ffi::wrap_atomic_buffer(buffer)
         }
@@ -305,7 +306,7 @@ impl AtomicBuffer {
     }
 
     #[inline]
-    pub fn put_bytes_from_buffer(&mut self, index: i32, src_buffer: &ffi::AtomicBuffer, src_index: i32, length: i32) {
+    pub fn put_bytes_from_buffer(&mut self, index: i32, src_buffer: &ffi::CxxAtomicBuffer, src_index: i32, length: i32) {
         self.atomic_buffer.as_mut().unwrap().put_bytes_from_buffer(index, src_buffer, src_index, length);
     }
 
@@ -349,20 +350,27 @@ impl AtomicBuffer {
         ffi::get_string_without_length(&self.atomic_buffer, offset, length)
     }
 
-    pub fn get_ref(&self) -> &UniquePtr<ffi::AtomicBuffer> {
+    pub fn get_ref(&self) -> &UniquePtr<ffi::CxxAtomicBuffer> {
         &self.atomic_buffer
     }
-    pub fn as_ref(&self) -> &ffi::AtomicBuffer {
-        self.atomic_buffer.as_ref().unwrap()
+}
+
+impl Deref for AtomicBuffer {
+    type Target = ffi::CxxAtomicBuffer;
+
+    fn deref(&self) -> &Self::Target {
+        &self.atomic_buffer.as_ref().unwrap()
     }
-    pub fn as_mut(&mut self) -> Pin<& mut ffi::AtomicBuffer> {
+}
+
+impl DerefMut for AtomicBuffer {
+    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
         self.atomic_buffer.as_mut().unwrap()
     }
 }
 
-
-impl From <UniquePtr<ffi::AtomicBuffer>> for AtomicBuffer{
-    fn from(atomic_buffer: UniquePtr<ffi::AtomicBuffer>) -> Self{
+impl From <UniquePtr<ffi::CxxAtomicBuffer>> for AtomicBuffer{
+    fn from(atomic_buffer: UniquePtr<ffi::CxxAtomicBuffer>) -> Self{
         Self::new(atomic_buffer)
     }
 }

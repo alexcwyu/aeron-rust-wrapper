@@ -2,16 +2,19 @@ use std::ffi::CString;
 use std::io::{stdout, Write};
 use std::pin::pin;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::thread;
+use std::{slice, thread};
 use std::time::Duration;
 
 use cxx::{CxxString, let_cxx_string};
 use lazy_static::lazy_static;
+use nix::NixPath;
 
-use aeron_rs::concurrent::atomic_buffer::AlignedBuffer;
+use aeron_rs::concurrent::atomic_buffer::{AlignedBuffer};
 use aeron_rs::example_config::{DEFAULT_CHANNEL, DEFAULT_STREAM_ID};
 use aeron_rust_wrapper::aeron::aeron;
+use aeron_rust_wrapper::aeron::aeron::Aeron;
 use aeron_rust_wrapper::aeron::concurrent::atomic_buffer;
+use aeron_rust_wrapper::aeron::concurrent::atomic_buffer::AtomicBuffer;
 use aeron_rust_wrapper::aeron::context;
 
 lazy_static! {
@@ -59,13 +62,7 @@ fn str_to_c(val: &str) -> CString {
     CString::new(val).expect("Error converting str to CString")
 }
 
-fn convert_mut<T>(reference: &T) -> &mut T {
-    unsafe {
-        let const_ptr = reference as *const T;
-        let mut_ptr = const_ptr as *mut T;
-        &mut *mut_ptr
-    }
-}
+
 
 fn main() {
     pretty_env_logger::init();
@@ -82,33 +79,35 @@ fn main() {
         settings.channel, settings.stream_id
     );
 
+    let mut context = context::Context::new_instance("test");
 
-    let mut context = aeron_rust_wrapper::aeron::context::ffi::new_instance();
-
+    println!("setting prefix");
     if !settings.dir_prefix.is_empty() {
-        let_cxx_string!(dir_prefix = settings.dir_prefix);
-        context.as_mut().unwrap().set_aeron_dir(&dir_prefix);
+        context.set_aeron_dir(&settings.dir_prefix);
     }
+
 
 
     println!("Using CnC file: {}", context.cnc_file_name());
+    println!("client name: {}",context.client_name());
 
-    context::ffi::new_publication_handler(context.pin_mut(), on_new_publication_handler);
-    context.set_pre_touch_mapped_memory(true);
-
-    let mut aeron = aeron::ffi::connect_with_context(context.pin_mut());
-
-    let_cxx_string!(channel = settings.channel);
-    let publication_id = aeron.as_mut().unwrap().add_publication(&channel, settings.stream_id);
+    context.new_publication_handler(on_new_publication_handler);
+    context.pre_touch_mapped_memory(true);
 
 
-    let mut publication = aeron.as_mut().unwrap().find_publication(publication_id);
+    println!("setting aeron");
+    let mut aeron = Aeron::connect_with_context(context.as_mut());
+
+    println!("add_subscription");
+    let publication_id = aeron.add_publication(settings.channel, settings.stream_id);
+
+
+    let mut publication = aeron.find_publication(publication_id);
     while publication.is_null() || !publication.is_connected() {
         thread::yield_now();
-        publication = aeron.as_mut().unwrap().find_publication(publication_id);
+        publication = aeron.find_publication(publication_id);
     }
 
-    let publication = convert_mut(publication.as_ref().unwrap());
 
     let channel_status = publication.channel_status();
 
@@ -118,7 +117,7 @@ fn main() {
     );
 
     let buffer = AlignedBuffer::with_capacity(256);
-    let mut src_buffer = unsafe { atomic_buffer::ffi::new_instance(buffer.ptr, buffer.len as usize) };
+    let mut src_buffer = unsafe { AtomicBuffer::wrap_bytes(buffer.ptr, buffer.len as usize) };
 
     for i in 0..settings.number_of_messages {
         if !RUNNING.load(Ordering::SeqCst) {
@@ -129,16 +128,38 @@ fn main() {
 
         let_cxx_string!(c_str_msg = str_msg);
 
-        src_buffer.as_mut().unwrap().put_string(0, &c_str_msg);
+        let str_msg = format!("Basic publisher msg #{}", i);
+        let c_str_msg = CString::new(str_msg.clone()).unwrap();
+        let src = c_str_msg.as_bytes();
+        let len = src.len();
+        unsafe {
+            src_buffer.put_bytes(0, src.as_ptr(), src.len() as i32);
 
-        println!("offering {}/{}", i + 1, settings.number_of_messages);
+            let slice_msg = slice::from_raw_parts_mut(src_buffer.buffer().offset(0), len as usize);
+            let msg = CString::new(slice_msg).unwrap();
+
+            println!("offering {}/{}, input str={}, input str len={}, src len={}, output={}", i + 1, settings.number_of_messages, str_msg, str_msg.len(), len, msg.to_str().unwrap());
+        }
+
+
+
         stdout().flush().ok();
 
-        let publication = convert_mut(publication);
-        let result = pin!(publication).offer_part(src_buffer.as_ref().unwrap(), 0, c_str_msg.len() as i32);
+        loop {
+            let result = publication.offer_part(src_buffer.as_ref(), 0, c_str_msg.len() as i32);
 
-        println!("Sent with len {}!", result);
 
+
+            if result > 0 {
+                println!("Sent with code {}!", result);
+                break;
+            }
+            else
+            {
+                println!("resending... {}!", result);
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        }
 
         if !publication.is_connected() {
             println!("No active subscribers detected");

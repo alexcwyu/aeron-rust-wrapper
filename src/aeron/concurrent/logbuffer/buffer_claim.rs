@@ -1,8 +1,9 @@
+use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 
 use cxx::UniquePtr;
 
-use crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+use crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 #[cxx::bridge(namespace = "aeron::concurrent::logbuffer")]
 pub mod ffi {
@@ -11,59 +12,59 @@ pub mod ffi {
     // C++ types and signatures exposed to Rust.
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/logbuffer/BufferClaim.h");
 
-        type BufferClaim;
-
-        fn wrap(self: Pin<&mut BufferClaim>, buffer : Pin<&mut AtomicBuffer>, offset: i32, length: i32);
-
-        fn offset(self: &BufferClaim) -> i32;
-        fn length(self: &BufferClaim) -> i32;
-        fn flags(self: &BufferClaim) -> u8;
-        #[rust_name = "header_type"]
-        fn headerType(self: &BufferClaim) -> u16;
-        #[rust_name = "reserved_value"]
-        fn reservedValue(self: &BufferClaim) -> i64;
-        fn commit(self: Pin<&mut BufferClaim>);
-        fn abort(self: Pin<&mut BufferClaim>);
-
+        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/BufferClaim.cpp");
+        
         //this_t& flags(const std::uint8_t flags)
-
         //this_t &reservedValue(const std::int64_t value)
 
-        include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/BufferClaim.cpp");
+        #[rust_name = "CxxBufferClaim"]
+        type BufferClaim;
+
+        fn wrap(self: Pin<&mut CxxBufferClaim>, buffer : Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32);
+
+        fn offset(self: &CxxBufferClaim) -> i32;
+        fn length(self: &CxxBufferClaim) -> i32;
+        fn flags(self: &CxxBufferClaim) -> u8;
+        #[rust_name = "header_type"]
+        fn headerType(self: &CxxBufferClaim) -> u16;
+        #[rust_name = "reserved_value"]
+        fn reservedValue(self: &CxxBufferClaim) -> i64;
+        fn commit(self: Pin<&mut CxxBufferClaim>);
+        fn abort(self: Pin<&mut CxxBufferClaim>);
         #[namespace = "aeron::concurrent::logbuffer::buffer_claim"]
         #[rust_name = "new_instance"]
-        fn newInstance() -> UniquePtr<BufferClaim>;
+        fn newInstance() -> UniquePtr<CxxBufferClaim>;
 
         #[namespace = "aeron::concurrent::logbuffer::buffer_claim"]
         #[rust_name = "wrap_raw_buffer"]
-        unsafe fn wrapRawBuffer(buffer_claim: Pin<&mut BufferClaim>, buffer: *mut u8, length: i32);
+        unsafe fn wrapRawBuffer(buffer_claim: Pin<&mut CxxBufferClaim>, buffer: *mut u8, length: i32);
 
         #[namespace = "aeron::concurrent::logbuffer::buffer_claim"]
         #[rust_name = "get_buffer"]
-        fn getBuffer(buffer_claim: Pin<&mut BufferClaim>, buffer: & UniquePtr<AtomicBuffer>);
+        fn getBuffer(buffer_claim: Pin<&mut CxxBufferClaim>, buffer: & UniquePtr<CxxAtomicBuffer>);
 
     }
 
 
-    impl SharedPtr<BufferClaim> {}
-    impl UniquePtr<BufferClaim> {}
+    impl SharedPtr<CxxBufferClaim> {}
+    impl UniquePtr<CxxBufferClaim> {}
 }
 
 
-unsafe impl Sync for ffi::BufferClaim {}
-unsafe impl Send for ffi::BufferClaim {}
+unsafe impl Sync for ffi::CxxBufferClaim {}
+unsafe impl Send for ffi::CxxBufferClaim {}
 
 pub struct BufferClaim {
-    buffer_claim: UniquePtr<ffi::BufferClaim>,
+    buffer_claim: UniquePtr<ffi::CxxBufferClaim>,
 }
 
 impl BufferClaim {
     #[inline]
-    pub fn new(buffer_claim: UniquePtr<ffi::BufferClaim>) -> Self {
+    pub fn new(buffer_claim: UniquePtr<ffi::CxxBufferClaim>) -> Self {
         Self {
             buffer_claim
         }
@@ -84,7 +85,7 @@ impl BufferClaim {
     }
 
     #[inline]
-    pub fn wrap(&mut self, buffer: Pin<&mut ffi::AtomicBuffer>, offset: i32, length: i32) {
+    pub fn wrap(&mut self, buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) {
         self.buffer_claim.as_mut().unwrap().wrap(buffer, offset, length);
     }
 
@@ -124,26 +125,33 @@ impl BufferClaim {
     }
 
     #[inline]
-    pub fn get_buffer(&mut self, buffer: & UniquePtr<AtomicBuffer>) {
+    pub fn get_buffer(&mut self, buffer: & UniquePtr<CxxAtomicBuffer>) {
         ffi::get_buffer(self.buffer_claim.as_mut().unwrap(), buffer);
     }
     #[inline]
-    pub fn get_ref(&self) -> &UniquePtr<ffi::BufferClaim> {
+    pub fn get_ref(&self) -> &UniquePtr<ffi::CxxBufferClaim> {
         &self.buffer_claim
     }
-    #[inline]
-    pub fn as_ref(&self) -> &ffi::BufferClaim {
-        self.buffer_claim.as_ref().unwrap()
+
+
+}
+
+impl Deref for BufferClaim {
+    type Target = ffi::CxxBufferClaim;
+
+    fn deref(&self) -> &Self::Target {
+        &self.buffer_claim.as_ref().unwrap()
     }
-    #[inline]
-    pub fn as_mut(&mut self) -> Pin<& mut ffi::BufferClaim> {
+}
+
+impl DerefMut for BufferClaim {
+    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
         self.buffer_claim.as_mut().unwrap()
     }
 }
 
-
-impl From <UniquePtr<ffi::BufferClaim>> for BufferClaim {
-    fn from(buffer_claim: UniquePtr<ffi::BufferClaim>) -> Self{
+impl From <UniquePtr<ffi::CxxBufferClaim>> for BufferClaim {
+    fn from(buffer_claim: UniquePtr<ffi::CxxBufferClaim>) -> Self{
         Self::new(buffer_claim)
     }
 }

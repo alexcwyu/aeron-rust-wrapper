@@ -7,7 +7,7 @@
 
 namespace aeron { namespace context{
 
-inline std::unique_ptr<aeron::Context> newInstance(const rust::String clientName) {
+inline std::unique_ptr<aeron::Context> newInstance(const rust::Str clientName) {
     std::string clientNameStr = std::string(clientName);
     Context * context = new aeron::Context();
     context->clientName(clientNameStr);
@@ -19,12 +19,12 @@ inline void conclude(const std::unique_ptr<aeron::Context> &context) {
     context->conclude();
 }
 
-inline void aeronDir(const std::unique_ptr<aeron::Context> &context, const std::string &directory){
-    context->aeronDir(directory);
+inline void aeronDir(const std::unique_ptr<aeron::Context> &context, const rust::Str directory){
+    context->aeronDir(std::string(directory));
 }
 
-inline void clientName(const std::unique_ptr<aeron::Context> &context, const std::string &clientName){
-    context->clientName(clientName);
+inline void clientName(const std::unique_ptr<aeron::Context> &context, const rust::Str clientName){
+    context->clientName(std::string(clientName));
 }
 
 inline void idleSleepDuration(const std::unique_ptr<aeron::Context> &context, long value){
@@ -80,20 +80,26 @@ inline void closeClientHandler(const std::unique_ptr<aeron::Context> &context, r
     context->closeClientHandler(handler);
 }
 
-inline bool requestDriverTermination(const std::string &directory, const std::uint8_t *tokenBuffer, std::size_t tokenLength){
-    return aeron::Context::requestDriverTermination(directory, tokenBuffer, tokenLength);
+inline bool requestDriverTermination(rust::Str directory, const std::uint8_t *tokenBuffer, std::size_t tokenLength){
+    std::string dir = std::string(directory);
+    return aeron::Context::requestDriverTermination(dir, tokenBuffer, tokenLength);
 }
 
 inline rust::String defaultAeronPath() {
     return aeron::Context::defaultAeronPath();
 }
 
-inline rust::String dirName(const aeron::Context &context) {
-    return context.dirName();
+//inline rust::String dirName(const aeron::Context &context) {
+//    return context.dirName();
+//}
+
+inline rust::String cncFileName(const std::unique_ptr<aeron::Context> &context) {
+    return context->cncFileName();
+//    rust::String str = context.dirName() + std::string(1, AERON_FILE_SEP) + CncFileDescriptor::CNC_FILE;
+//    return str;
 }
 
-inline rust::String cncFileName(const aeron::Context &context) {
-    rust::String str = context.dirName() + std::string(1, AERON_FILE_SEP) + CncFileDescriptor::CNC_FILE;
-    return str;
+inline rust::String clientName(const std::unique_ptr<aeron::Context> &context) {
+    return context->clientName();
 }
 }}

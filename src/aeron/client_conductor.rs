@@ -1,51 +1,37 @@
+use std::ops::Deref;
 use std::pin::Pin;
 
 use cxx::{CxxString, SharedPtr};
 
-use crate::aeron::concurrent::counters_reader::ffi::CountersReader;
-use crate::aeron::counter::ffi::Counter;
-use crate::aeron::exclusive_publication::ffi::ExclusivePublication;
-use crate::aeron::image::ffi::Image;
-use crate::aeron::publication::ffi::Publication;
-use crate::aeron::subscription::ffi::Subscription;
+use crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
+use crate::aeron::counter::ffi::CxxCounter;
+use crate::aeron::exclusive_publication::ffi::CxxExclusivePublication;
+use crate::aeron::image::ffi::CxxImage;
+use crate::aeron::publication::ffi::CxxPublication;
+use crate::aeron::subscription::ffi::CxxSubscription;
 
 #[cxx::bridge(namespace = "aeron")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
 
         #[namespace = "aeron"]
-        type Counter = crate::aeron::counter::ffi::Counter;
+        type CxxCounter = crate::aeron::counter::ffi::CxxCounter;
         #[namespace = "aeron"]
-        type Image = crate::aeron::image::ffi::Image;
+        type CxxImage = crate::aeron::image::ffi::CxxImage;
         #[namespace = "aeron"]
-        type Subscription = crate::aeron::subscription::ffi::Subscription;
+        type CxxSubscription = crate::aeron::subscription::ffi::CxxSubscription;
 
         #[namespace = "aeron"]
-        type Publication = crate::aeron::publication::ffi::Publication;
+        type CxxPublication = crate::aeron::publication::ffi::CxxPublication;
 
         #[namespace = "aeron"]
-        type ExclusivePublication = crate::aeron::exclusive_publication::ffi::ExclusivePublication;
+        type CxxExclusivePublication = crate::aeron::exclusive_publication::ffi::CxxExclusivePublication;
 
         #[namespace = "aeron::concurrent"]
-        type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CountersReader;
+        type CxxCountersReader = crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ClientConductor.h");
-
-        type ClientConductor;
-
-
-        #[rust_name = "channel_status"]
-        fn channelStatus(self: &ClientConductor, counter_id: i32) -> i64;
-
-        #[rust_name = "is_closed"]
-        fn isClosed(self: &ClientConductor) -> bool;
-
-
-        #[rust_name = "ensure_open"]
-        fn ensureOpen(self: &ClientConductor);
-
-
         include!("aeron-rust-wrapper/cxx_wrapper/ClientConductor.cpp");
 
         // #[rust_name = "release_subscription"]
@@ -62,70 +48,84 @@ pub(crate) mod ffi {
         // fn countersReader(conductor: &SharedPtr<ClientConductor>) -> Pin<&mut CountersReader>;
 
 
+        #[rust_name = "CxxClientConductor"]
+        type ClientConductor;
+
+
+        #[rust_name = "channel_status"]
+        fn channelStatus(self: &CxxClientConductor, counter_id: i32) -> i64;
+
+        #[rust_name = "is_closed"]
+        fn isClosed(self: &CxxClientConductor) -> bool;
+
+
+        #[rust_name = "ensure_open"]
+        fn ensureOpen(self: &CxxClientConductor);
+
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_start"]
-        fn onStart(conductor: &SharedPtr<ClientConductor>);
+        fn onStart(conductor: &SharedPtr<CxxClientConductor>);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "do_work"]
-        fn doWork(conductor: &SharedPtr<ClientConductor>) -> i32;
+        fn doWork(conductor: &SharedPtr<CxxClientConductor>) -> i32;
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_close"]
-        fn onClose(conductor: &SharedPtr<ClientConductor>);
+        fn onClose(conductor: &SharedPtr<CxxClientConductor>);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_publication"]
-        fn addPublication(conductor: &SharedPtr<ClientConductor>, channel: String, stream_id: i32) -> i64;
+        fn addPublication(conductor: &SharedPtr<CxxClientConductor>, channel: String, stream_id: i32) -> i64;
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "find_publication"]
-        fn findPublication(conductor: &SharedPtr<ClientConductor>, registration_id: i64) -> SharedPtr<Publication>;
+        fn findPublication(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64) -> SharedPtr<CxxPublication>;
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "release_publication"]
-        fn releasePublication(conductor: &SharedPtr<ClientConductor>, registration_id: i64);
+        fn releasePublication(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_exclusive_publication"]
-        fn addExclusivePublication(conductor: &SharedPtr<ClientConductor>, channel: String, stream_id: i32) -> i64;
+        fn addExclusivePublication(conductor: &SharedPtr<CxxClientConductor>, channel: String, stream_id: i32) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "find_exclusive_publication"]
-        fn findExclusivePublication(conductor: &SharedPtr<ClientConductor>, registration_id: i64) -> SharedPtr<ExclusivePublication>;
+        fn findExclusivePublication(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64) -> SharedPtr<CxxExclusivePublication>;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "release_exclusive_publication"]
-        fn releaseExclusivePublication(conductor: &SharedPtr<ClientConductor>, registration_id: i64);
+        fn releaseExclusivePublication(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "find_subscription"]
-        fn findSubscription(conductor: &SharedPtr<ClientConductor>, registration_id: i64) -> SharedPtr<Subscription>;
+        fn findSubscription(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64) -> SharedPtr<CxxSubscription>;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_counter"]
-        unsafe fn addCounter(conductor: &SharedPtr<ClientConductor>, type_id: i32, key_buffer: *const u8, key_length: usize, label: String) -> i64;
+        unsafe fn addCounter(conductor: &SharedPtr<CxxClientConductor>, type_id: i32, key_buffer: *const u8, key_length: usize, label: String) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "find_counter"]
-        fn findCounter(conductor: &SharedPtr<ClientConductor>, registration_id: i64) -> SharedPtr<Counter>;
+        fn findCounter(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64) -> SharedPtr<CxxCounter>;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "release_counter"]
-        fn releaseCounter(conductor: &SharedPtr<ClientConductor>, registration_id: i64);
+        fn releaseCounter(conductor: &SharedPtr<CxxClientConductor>, registration_id: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "find_destination_response"]
-        fn findDestinationResponse(conductor: &SharedPtr<ClientConductor>, correlation_id: i64) -> bool;
+        fn findDestinationResponse(conductor: &SharedPtr<CxxClientConductor>, correlation_id: i64) -> bool;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_new_publication"]
         fn onNewPublication(
-            conductor: &SharedPtr<ClientConductor>,
+            conductor: &SharedPtr<CxxClientConductor>,
             registrationId: i64,
             originalRegistrationId: i64,
             streamId: i32,
@@ -138,7 +138,7 @@ pub(crate) mod ffi {
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_new_exclusive_publication"]
         fn onNewExclusivePublication(
-            conductor: &SharedPtr<ClientConductor>,
+            conductor: &SharedPtr<CxxClientConductor>,
             registrationId: i64,
             originalRegistrationId: i64,
             streamId: i32,
@@ -150,20 +150,20 @@ pub(crate) mod ffi {
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_subscription_ready"]
-        fn onSubscriptionReady(conductor: &SharedPtr<ClientConductor>, registrationId: i64, channelStatusId: i32);
+        fn onSubscriptionReady(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64, channelStatusId: i32);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_operation_success"]
-        fn onOperationSuccess(conductor: &SharedPtr<ClientConductor>, correlationId: i64);
+        fn onOperationSuccess(conductor: &SharedPtr<CxxClientConductor>, correlationId: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_channel_endpoint_error_response"]
-        fn onChannelEndpointErrorResponse(conductor: &SharedPtr<ClientConductor>, channelStatusId: i32, errorMessage: &CxxString);
+        fn onChannelEndpointErrorResponse(conductor: &SharedPtr<CxxClientConductor>, channelStatusId: i32, errorMessage: &CxxString);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_error_response"]
         fn onErrorResponse(
-            conductor: &SharedPtr<ClientConductor>,
+            conductor: &SharedPtr<CxxClientConductor>,
             offendingCommandCorrelationId: i64,
             errorCode: i32,
             errorMessage: &CxxString,
@@ -173,7 +173,7 @@ pub(crate) mod ffi {
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_available_image"]
         fn onAvailableImage(
-            conductor: &SharedPtr<ClientConductor>,
+            conductor: &SharedPtr<CxxClientConductor>,
             correlationId: i64,
             sessionId: i32,
             subscriberPositionId: i32,
@@ -184,98 +184,98 @@ pub(crate) mod ffi {
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_unavailable_image"]
-        fn onUnavailableImage(conductor: &SharedPtr<ClientConductor>, correlationId: i64, subscriptionRegistrationId: i64);
+        fn onUnavailableImage(conductor: &SharedPtr<CxxClientConductor>, correlationId: i64, subscriptionRegistrationId: i64);
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_available_counter"]
-        fn onAvailableCounter(conductor: &SharedPtr<ClientConductor>, registrationId: i64, counterId: i32);
+        fn onAvailableCounter(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64, counterId: i32);
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_unavailable_counter"]
-        fn onUnavailableCounter(conductor: &SharedPtr<ClientConductor>, registrationId: i64, counterId: i32);
+        fn onUnavailableCounter(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64, counterId: i32);
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "on_client_timeout"]
-        fn onClientTimeout(conductor: &SharedPtr<ClientConductor>, clientId: i64);
+        fn onClientTimeout(conductor: &SharedPtr<CxxClientConductor>, clientId: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_destination"]
-        fn addDestination(conductor: &SharedPtr<ClientConductor>, publicationRegistrationId: i64, endpointChannel: String) -> i64;
+        fn addDestination(conductor: &SharedPtr<CxxClientConductor>, publicationRegistrationId: i64, endpointChannel: String) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_destination"]
-        fn removeDestination(conductor: &SharedPtr<ClientConductor>, publicationRegistrationId: i64, endpointChannel: String) -> i64;
+        fn removeDestination(conductor: &SharedPtr<CxxClientConductor>, publicationRegistrationId: i64, endpointChannel: String) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_rcv_destination"]
-        fn addRcvDestination(conductor: &SharedPtr<ClientConductor>, subscriptionRegistrationId: i64, endpointChannel: String) -> i64;
+        fn addRcvDestination(conductor: &SharedPtr<CxxClientConductor>, subscriptionRegistrationId: i64, endpointChannel: String) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_rcv_destination"]
-        fn removeRcvDestination(conductor: &SharedPtr<ClientConductor>, subscriptionRegistrationId: i64, endpointChannel: String) -> i64;
+        fn removeRcvDestination(conductor: &SharedPtr<CxxClientConductor>, subscriptionRegistrationId: i64, endpointChannel: String) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_available_counter_handler_by_id"]
-        fn removeAvailableCounterHandler(conductor: &SharedPtr<ClientConductor>, registrationId: i64);
+        fn removeAvailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64);
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_unavailable_counter_handler_by_id"]
-        fn removeUnavailableCounterHandler(conductor: &SharedPtr<ClientConductor>, registrationId: i64);
+        fn removeUnavailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64);
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_close_client_handler_by_id"]
-        fn removeCloseClientHandler(conductor: &SharedPtr<ClientConductor>, registrationId: i64);
+        fn removeCloseClientHandler(conductor: &SharedPtr<CxxClientConductor>, registrationId: i64);
 
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_subscription"]
-        fn addSubscription(conductor: &SharedPtr<ClientConductor>, channel: String, stream_id: i32, on_available_image_t: fn(image: Pin<&mut Image>) -> (), on_unavailable_image_t: fn(image: Pin<&mut Image>) -> ()) -> i64;
+        fn addSubscription(conductor: &SharedPtr<CxxClientConductor>, channel: String, stream_id: i32, on_available_image_t: fn(image: Pin<&mut CxxImage>) -> (), on_unavailable_image_t: fn(image: Pin<&mut CxxImage>) -> ()) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_available_counter_handler"]
-        fn addAvailableCounterHandler(conductor: &SharedPtr<ClientConductor>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64;
+        fn addAvailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_available_counter_handler"]
-        fn removeAvailableCounterHandler(conductor: &SharedPtr<ClientConductor>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ());
+        fn removeAvailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ());
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_unavailable_counter_handler"]
-        fn addUnavailableCounterHandler(conductor: &SharedPtr<ClientConductor>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64;
+        fn addUnavailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_unavailable_counter_handler"]
-        fn removeUnavailableCounterHandler(conductor: &SharedPtr<ClientConductor>, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ());
+        fn removeUnavailableCounterHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ());
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "add_close_client_handler"]
-        fn addCloseClientHandler(conductor: &SharedPtr<ClientConductor>, handler: fn() -> ()) -> i64;
+        fn addCloseClientHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn() -> ()) -> i64;
 
         #[namespace = "aeron::client_conductor"]
         #[rust_name = "remove_close_client_handler"]
-        fn removeCloseClientHandler(conductor: &SharedPtr<ClientConductor>, handler: fn() -> ());
+        fn removeCloseClientHandler(conductor: &SharedPtr<CxxClientConductor>, handler: fn() -> ());
 
     }
 
-    impl SharedPtr<ClientConductor> {}
+    impl SharedPtr<CxxClientConductor> {}
 }
 
-unsafe impl Sync for ffi::ClientConductor {}
-unsafe impl Send for ffi::ClientConductor {}
+unsafe impl Sync for ffi::CxxClientConductor {}
+unsafe impl Send for ffi::CxxClientConductor {}
 
 
 #[derive(Clone)]
 pub struct ClientConductor {
-    conductor: SharedPtr<ffi::ClientConductor>,
+    conductor: SharedPtr<ffi::CxxClientConductor>,
 }
 
 impl ClientConductor {
 
-    pub fn new(conductor: SharedPtr<ffi::ClientConductor>) -> Self{
+    pub fn new(conductor: SharedPtr<ffi::CxxClientConductor>) -> Self{
         Self{
             conductor
         }
@@ -316,7 +316,7 @@ impl ClientConductor {
     }
 
     #[inline]
-    pub fn find_publication(&self, registration_id: i64) -> SharedPtr<Publication> {
+    pub fn find_publication(&self, registration_id: i64) -> SharedPtr<CxxPublication> {
         ffi::find_publication(&self.conductor, registration_id)
     }
 
@@ -331,7 +331,7 @@ impl ClientConductor {
     }
 
     #[inline]
-    pub fn find_exclusive_publication(&self, registration_id: i64) -> SharedPtr<ExclusivePublication> {
+    pub fn find_exclusive_publication(&self, registration_id: i64) -> SharedPtr<CxxExclusivePublication> {
         ffi::find_exclusive_publication(&self.conductor, registration_id)
     }
 
@@ -341,7 +341,7 @@ impl ClientConductor {
     }
 
     #[inline]
-    pub fn find_subscription(&self, registration_id: i64) -> SharedPtr<Subscription> {
+    pub fn find_subscription(&self, registration_id: i64) -> SharedPtr<CxxSubscription> {
         ffi::find_subscription(&self.conductor, registration_id)
     }
 
@@ -351,7 +351,7 @@ impl ClientConductor {
     }
 
     #[inline]
-    pub fn find_counter(&self, registration_id: i64) -> SharedPtr<Counter> {
+    pub fn find_counter(&self, registration_id: i64) -> SharedPtr<CxxCounter> {
         ffi::find_counter(&self.conductor, registration_id)
     }
 
@@ -457,27 +457,27 @@ impl ClientConductor {
     }
 
     #[inline]
-    pub fn add_subscription(&self, channel: String, stream_id: i32, on_available_image_t: fn(image: Pin<&mut Image>) -> (), on_unavailable_image_t: fn(image: Pin<&mut Image>) -> ()) -> i64 {
+    pub fn add_subscription(&self, channel: String, stream_id: i32, on_available_image_t: fn(image: Pin<&mut CxxImage>) -> (), on_unavailable_image_t: fn(image: Pin<&mut CxxImage>) -> ()) -> i64 {
         ffi::add_subscription(&self.conductor, channel, stream_id, on_available_image_t, on_unavailable_image_t)
     }
 
     #[inline]
-    pub fn add_available_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64 {
+    pub fn add_available_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64 {
         ffi::add_available_counter_handler(&self.conductor, handler)
     }
 
     #[inline]
-    pub fn remove_available_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) {
+    pub fn remove_available_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) {
         ffi::remove_available_counter_handler(&self.conductor, handler);
     }
 
     #[inline]
-    pub fn add_unavailable_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64 {
+    pub fn add_unavailable_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) -> i64 {
         ffi::add_unavailable_counter_handler(&self.conductor, handler)
     }
 
     #[inline]
-    pub fn remove_unavailable_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CountersReader>, registration_id: i64, counter_id: i32) -> ()) {
+    pub fn remove_unavailable_counter_handler(&self, handler: fn(counters_reader: Pin<&mut CxxCountersReader>, registration_id: i64, counter_id: i32) -> ()) {
         ffi::remove_unavailable_counter_handler(&self.conductor, handler);
     }
 
@@ -491,13 +491,22 @@ impl ClientConductor {
         ffi::remove_close_client_handler(&self.conductor, handler);
     }
 
-    pub fn get_ref(&self) -> &SharedPtr<ffi::ClientConductor> {
+    pub fn get_ref(&self) -> &SharedPtr<ffi::CxxClientConductor> {
         &self.conductor
     }
 }
 
-impl From <SharedPtr<ffi::ClientConductor>> for ClientConductor {
-    fn from(conductor: SharedPtr<ffi::ClientConductor>) -> Self{
+impl Deref for ClientConductor {
+    type Target = ffi::CxxClientConductor;
+
+    fn deref(&self) -> &Self::Target {
+        &self.conductor.as_ref().unwrap()
+    }
+}
+
+
+impl From <SharedPtr<ffi::CxxClientConductor>> for ClientConductor {
+    fn from(conductor: SharedPtr<ffi::CxxClientConductor>) -> Self{
         Self::new(conductor)
     }
 }

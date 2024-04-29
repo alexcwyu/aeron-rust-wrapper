@@ -1,146 +1,140 @@
+use std::ops::Deref;
 use std::pin::Pin;
 
 use cxx::{CxxVector, SharedPtr};
 
-use crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
-use crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+use crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+use crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
 #[cxx::bridge(namespace = "aeron")]
-pub(crate) mod ffi {
+pub mod ffi {
 
     unsafe extern "C++" {
-
         #[namespace = "aeron::concurrent"]
-        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::AtomicBuffer;
+        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         #[namespace = "aeron::concurrent::logbuffer"]
-        type BufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::BufferClaim;
+        type CxxBufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Publication.h");
-
-        type Publication;
-
-        fn channel(self: &Publication) -> &CxxString;
-
-        #[rust_name = "stream_id"]
-        fn streamId(self: &Publication) -> i32;
-
-        #[rust_name = "session_id"]
-        fn sessionId(self: &Publication) -> i32;
-
-        #[rust_name = "initial_term_id"]
-        fn initialTermId(self: &Publication) -> i32;
-
-        #[rust_name = "original_registration_id"]
-        fn originalRegistrationId(self: &Publication) -> i64;
-
-        #[rust_name = "registration_id"]
-        fn registrationId(self: &Publication) -> i64;
-
-        #[rust_name = "is_original"]
-        fn isOriginal(self: &Publication) -> bool;
-
-        #[rust_name = "max_message_length"]
-        fn maxMessageLength(self: &Publication) -> i32;
-
-        #[rust_name = "max_payload_length"]
-        fn maxPayloadLength(self: &Publication) -> i32;
-
-        #[rust_name = "term_buffer_length"]
-        fn termBufferLength(self: &Publication) -> i32;
-
-        #[rust_name = "position_bits_to_shift"]
-        fn positionBitsToShift(self: &Publication) -> i32;
-
-        #[rust_name = "is_connected"]
-        fn isConnected(self: &Publication) -> bool;
-
-        #[rust_name = "is_closed"]
-        fn isClosed(self: &Publication) -> bool;
-
-        #[rust_name = "max_possible_position"]
-        fn maxPossiblePosition(self: &Publication) -> i64;
-        fn position(self: &Publication) -> i64;
-
-        #[rust_name = "publication_limit"]
-        fn publicationLimit(self: &Publication) -> i64;
-
-        #[rust_name = "publication_limit_id"]
-        fn publicationLimitId(self: &Publication) -> i32;
-
-        #[rust_name = "available_window"]
-        fn availableWindow(self: &Publication) -> i64;
-
-        #[rust_name = "channel_status_id"]
-        fn channelStatusId(self: &Publication) -> i32;
-
-        #[rust_name = "channel_status"]
-        fn channelStatus(self: &Publication) -> i64;
-
+        include!("aeron-rust-wrapper/cxx_wrapper/Publication.cpp");
 
         //std::vector<std::string> localSocketAddresses() const
 
+        #[rust_name = "CxxPublication"]
+        type Publication;
 
-        include!("aeron-rust-wrapper/cxx_wrapper/Publication.cpp");
+        fn channel(self: &CxxPublication) -> &CxxString;
+
+        #[rust_name = "stream_id"]
+        fn streamId(self: &CxxPublication) -> i32;
+
+        #[rust_name = "session_id"]
+        fn sessionId(self: &CxxPublication) -> i32;
+
+        #[rust_name = "initial_term_id"]
+        fn initialTermId(self: &CxxPublication) -> i32;
+
+        #[rust_name = "original_registration_id"]
+        fn originalRegistrationId(self: &CxxPublication) -> i64;
+
+        #[rust_name = "registration_id"]
+        fn registrationId(self: &CxxPublication) -> i64;
+
+        #[rust_name = "is_original"]
+        fn isOriginal(self: &CxxPublication) -> bool;
+
+        #[rust_name = "max_message_length"]
+        fn maxMessageLength(self: &CxxPublication) -> i32;
+
+        #[rust_name = "max_payload_length"]
+        fn maxPayloadLength(self: &CxxPublication) -> i32;
+
+        #[rust_name = "term_buffer_length"]
+        fn termBufferLength(self: &CxxPublication) -> i32;
+
+        #[rust_name = "position_bits_to_shift"]
+        fn positionBitsToShift(self: &CxxPublication) -> i32;
+
+        #[rust_name = "is_connected"]
+        fn isConnected(self: &CxxPublication) -> bool;
+
+        #[rust_name = "is_closed"]
+        fn isClosed(self: &CxxPublication) -> bool;
+
+        #[rust_name = "max_possible_position"]
+        fn maxPossiblePosition(self: &CxxPublication) -> i64;
+        fn position(self: &CxxPublication) -> i64;
+
+        #[rust_name = "publication_limit"]
+        fn publicationLimit(self: &CxxPublication) -> i64;
+
+        #[rust_name = "publication_limit_id"]
+        fn publicationLimitId(self: &CxxPublication) -> i32;
+
+        #[rust_name = "available_window"]
+        fn availableWindow(self: &CxxPublication) -> i64;
+
+        #[rust_name = "channel_status_id"]
+        fn channelStatusId(self: &CxxPublication) -> i32;
+
+        #[rust_name = "channel_status"]
+        fn channelStatus(self: &CxxPublication) -> i64;
 
         #[namespace = "aeron::publication"]
-        fn channel(publication: &SharedPtr<Publication>) -> String;
+        fn channel(publication: &SharedPtr<CxxPublication>) -> String;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "add_destination"]
-        fn addDestination(publication: &SharedPtr<Publication>, endpoint_channel: String) ->i64;
+        fn addDestination(publication: &SharedPtr<CxxPublication>, endpoint_channel: String) ->i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "remove_destination"]
-        fn removeDestination(publication: &SharedPtr<Publication>, endpoint_channel: String) ->i64;
+        fn removeDestination(publication: &SharedPtr<CxxPublication>, endpoint_channel: String) ->i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "find_destination_response"]
-        fn findDestinationResponse(publication: &SharedPtr<Publication>, correlation_id: i64) -> bool;
+        fn findDestinationResponse(publication: &SharedPtr<CxxPublication>, correlation_id: i64) -> bool;
 
         #[namespace = "aeron::publication"]
-        fn close(publication: &SharedPtr<Publication>);
+        fn close(publication: &SharedPtr<CxxPublication>);
 
         #[namespace = "aeron::publication"]
         #[rust_name = "offer_part"]
-        fn offer(publication: &SharedPtr<Publication>, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64;
+        fn offer(publication: &SharedPtr<CxxPublication>, buffer: &CxxAtomicBuffer, offset: i32, length: i32) -> i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "offer"]
-        fn offer(publication: &SharedPtr<Publication>, buffer: &AtomicBuffer) -> i64;
+        fn offer(publication: &SharedPtr<CxxPublication>, buffer: &CxxAtomicBuffer) -> i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "try_claim"]
-        fn tryClaim(publication: &SharedPtr<Publication>, length: i32, bufferClaim : Pin<&mut BufferClaim>) ->i64;
+        fn tryClaim(publication: &SharedPtr<CxxPublication>, length: i32, bufferClaim : Pin<&mut CxxBufferClaim>) ->i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "offer_opt"]
-        fn offer(publication: &SharedPtr<Publication>, buffer: &AtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
+        fn offer(publication: &SharedPtr<CxxPublication>, buffer: &CxxAtomicBuffer, offset: i32, length: i32, reservedValueSupplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
 
         #[namespace = "aeron::publication"]
         #[rust_name = "offer_bulk"]
-        fn offer(publication: &SharedPtr<Publication>, buffer: &CxxVector<AtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
-
-        // #[namespace = "aeron::publication"]
-        // #[rust_name = "create_buffer_vector"]
-        // fn create_buffer_vector() -> UniquePtr<CxxVector<AtomicBuffer>>;
+        fn offer(publication: &SharedPtr<CxxPublication>, buffer: &CxxVector<CxxAtomicBuffer>, reservedValueSupplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64;
 
     }
 
-    impl SharedPtr<Publication> {}
+    impl SharedPtr<CxxPublication> {}
 }
 
-unsafe impl Sync for ffi::Publication {}
-unsafe impl Send for ffi::Publication {}
+unsafe impl Sync for ffi::CxxPublication {}
+unsafe impl Send for ffi::CxxPublication {}
 
 #[derive(Clone)]
 pub struct Publication{
-    publication: SharedPtr<ffi::Publication>,
+    publication: SharedPtr<ffi::CxxPublication>,
 }
 
 impl Publication {
-    pub fn new(publication: SharedPtr<ffi::Publication>) -> Self {
+    pub fn new(publication: SharedPtr<ffi::CxxPublication>) -> Self {
         Self {
             publication
         }
@@ -208,6 +202,11 @@ impl Publication {
     }
 
     #[inline]
+    pub fn is_null(&self) -> bool{
+        return self.publication.is_null();
+    }
+
+    #[inline]
     pub fn is_closed(&self) -> bool {
         self.publication.is_closed()
     }
@@ -267,37 +266,46 @@ impl Publication {
     }
 
     #[inline]
-    pub fn offer_part(&self, buffer: &AtomicBuffer, offset: i32, length: i32) -> i64 {
+    pub fn offer_part(&self, buffer: &CxxAtomicBuffer, offset: i32, length: i32) -> i64 {
         ffi::offer_part(&self.publication, buffer, offset, length)
     }
 
     #[inline]
-    pub fn offer(&self, buffer: &AtomicBuffer) -> i64 {
+    pub fn offer(&self, buffer: &CxxAtomicBuffer) -> i64 {
         ffi::offer(&self.publication, buffer)
     }
 
     #[inline]
-    pub fn try_claim(&self, length: i32, buffer_claim: Pin<&mut BufferClaim>) -> i64 {
+    pub fn try_claim(&self, length: i32, buffer_claim: Pin<&mut CxxBufferClaim>) -> i64 {
         ffi::try_claim(&self.publication, length, buffer_claim)
     }
 
     #[inline]
-    pub fn offer_opt(&self, buffer: &AtomicBuffer, offset: i32, length: i32, reserved_value_supplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
+    pub fn offer_opt(&self, buffer: &CxxAtomicBuffer, offset: i32, length: i32, reserved_value_supplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
         ffi::offer_opt(&self.publication, buffer, offset, length, reserved_value_supplier)
     }
 
     #[inline]
-    pub fn offer_bulk(&self, buffer: &CxxVector<AtomicBuffer>, reserved_value_supplier: fn(buffer: Pin<&mut AtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
+    pub fn offer_bulk(&self, buffer: &CxxVector<CxxAtomicBuffer>, reserved_value_supplier: fn(buffer: Pin<&mut CxxAtomicBuffer>, offset: i32, length: i32) -> i64) -> i64 {
         ffi::offer_bulk(&self.publication, buffer, reserved_value_supplier)
     }
 
-    pub fn get_ref(&self) -> &SharedPtr<ffi::Publication> {
+    pub fn get_ref(&self) -> &SharedPtr<ffi::CxxPublication> {
         &self.publication
     }
 }
 
-impl From <SharedPtr<ffi::Publication>> for Publication{
-    fn from(publication: SharedPtr<ffi::Publication>) -> Self{
+
+impl Deref for Publication {
+    type Target = ffi::CxxPublication;
+
+    fn deref(&self) -> &Self::Target {
+        &self.publication.as_ref().unwrap()
+    }
+}
+
+impl From <SharedPtr<ffi::CxxPublication>> for Publication{
+    fn from(publication: SharedPtr<ffi::CxxPublication>) -> Self{
         Self::new(publication)
     }
 }
