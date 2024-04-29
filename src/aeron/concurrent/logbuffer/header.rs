@@ -90,6 +90,7 @@ pub mod ffi {
         //void *context() const
 
     }
+    impl SharedPtr<CxxHeader> {}
 }
 
 pub struct Header {

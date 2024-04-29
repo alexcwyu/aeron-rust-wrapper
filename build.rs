@@ -11,10 +11,12 @@ fn main() {
 
     let aeron_client_cpps = [
         "Aeron.h",
+        "BufferBuilder.h",
         "ClientConductor.h",
         "Context.h",
         "Counter.h",
         "ExclusivePublication.h",
+        "FragmentAssembler.h",
         "Image.h",
         "LogBuffers.h",
         "LogBuffers.h",
@@ -31,10 +33,12 @@ fn main() {
 
     let aeron_wrapper_cpps = [
         "Aeron.cpp",
+        "BufferBuilder.cpp",
         "ClientConductor.cpp",
         "Context.cpp",
         "Counter.cpp",
         "ExclusivePublication.cpp",
+        "FragmentAssembler.cpp",
         "Image.cpp",
         "LogBuffers.cpp",
         "LogBuffers.cpp",
@@ -65,10 +69,12 @@ fn main() {
         "src/demo/mydata.rs",
 
         "src/aeron/aeron.rs",
+        "src/aeron/buffer_builder.rs",
         "src/aeron/client_conductor.rs",
         "src/aeron/context.rs",
         "src/aeron/counter.rs",
         "src/aeron/exclusive_publication.rs",
+        "src/aeron/fragment_assembler.rs",
         "src/aeron/image.rs",
         "src/aeron/log_buffers.rs",
         "src/aeron/publication.rs",

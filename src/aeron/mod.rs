@@ -8,5 +8,5 @@ pub mod publication;
 pub mod subscription;
 pub mod counter;
 pub mod client_conductor;
-// pub mod fragment_assembler;
-// mod fragment_assembler;
+pub mod fragment_assembler;
+pub mod buffer_builder;
