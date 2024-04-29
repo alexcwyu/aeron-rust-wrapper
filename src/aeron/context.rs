@@ -254,12 +254,15 @@ pub mod ffi {
     unsafe extern "C++" {
 
         #[namespace = "aeron"]
-        type CxxCounter = crate::aeron::counter::ffi::CxxCounter;
+        #[rust_name = "CxxCounter"]
+        type Counter = crate::aeron::counter::ffi::CxxCounter;
         #[namespace = "aeron"]
-        type CxxImage = crate::aeron::image::ffi::CxxImage;
+        #[rust_name = "CxxImage"]
+        type Image = crate::aeron::image::ffi::CxxImage;
 
         #[namespace = "aeron::concurrent"]
-        type CxxCountersReader = crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
+        #[rust_name = "CxxCountersReader"]
+        type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Context.h");
 
@@ -503,6 +506,10 @@ impl Context {
     pub fn get_ref(&self) -> &UniquePtr<ffi::CxxContext> {
         &self.context
     }
+
+    pub fn as_mut(&mut self) -> Pin<&mut ffi::CxxContext> {
+        self.context.as_mut().unwrap()
+    }
 }
 
 
@@ -510,15 +517,25 @@ impl Deref for Context {
     type Target = ffi::CxxContext;
 
     fn deref(&self) -> &Self::Target {
-        &self.context.as_ref().unwrap()
+        match self.context.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxContext"
+            ),
+        }
     }
 }
 
-impl DerefMut for Context {
-    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
-        self.context.as_mut().unwrap()
-    }
-}
+// impl DerefMut for Context {
+//     fn deref_mut(&mut self) -> &mut Self::Target {
+//         match self.context.as_mut() {
+//             Some(target) => Pin::into_inner(target),
+//             None => panic!(
+//                 "called deref_mut on a null ffi::CxxContext"
+//             ),
+//         }
+//     }
+// }
 
 impl From <UniquePtr<ffi::CxxContext>> for Context{
     fn from(context: UniquePtr<ffi::CxxContext>) -> Self{

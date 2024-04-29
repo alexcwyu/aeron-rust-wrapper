@@ -11,11 +11,13 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         #[namespace = "aeron::concurrent::logbuffer"]
-        type CxxBufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
+        #[rust_name = "CxxBufferClaim"]
+        type BufferClaim = crate::aeron::concurrent::logbuffer::buffer_claim::ffi::CxxBufferClaim;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Publication.h");
         include!("aeron-rust-wrapper/cxx_wrapper/Publication.cpp");
@@ -300,7 +302,12 @@ impl Deref for Publication {
     type Target = ffi::CxxPublication;
 
     fn deref(&self) -> &Self::Target {
-        &self.publication.as_ref().unwrap()
+        match self.publication.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxPublication"
+            ),
+        }
     }
 }
 

@@ -11,9 +11,11 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
         #[namespace = "aeron::concurrent::logbuffer"]
-        type CxxHeader = crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
+        #[rust_name = "CxxHeader"]
+        type Header = crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Image.h");
 
@@ -236,7 +238,12 @@ impl Deref for Image {
     type Target = CxxImage;
 
     fn deref(&self) -> &Self::Target {
-        &self.image.as_ref().unwrap()
+        match self.image.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxImage"
+            ),
+        }
     }
 }
 

@@ -4,7 +4,8 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/LogBuffers.h");

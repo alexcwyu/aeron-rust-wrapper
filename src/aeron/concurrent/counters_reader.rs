@@ -8,7 +8,8 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/CountersReader.h");
@@ -72,12 +73,12 @@ pub mod ffi {
 }
 
 pub struct CountersReader {
-    counters_reader: ffi::CxxCountersReader,
+    counters_reader: SharedPtr<ffi::CxxCountersReader>,
 }
 
 impl CountersReader {
     #[inline]
-    pub fn new(counters_reader: ffi::CxxCountersReader) -> Self {
+    pub fn new(counters_reader: SharedPtr<ffi::CxxCountersReader>) -> Self {
         Self {
             counters_reader
         }
@@ -164,8 +165,8 @@ impl Deref for CountersReader {
 }
 
 
-impl From <ffi::CxxCountersReader> for CountersReader {
-    fn from(counters_reader: ffi::CxxCountersReader) -> Self{
+impl From <SharedPtr<ffi::CxxCountersReader>> for CountersReader {
+    fn from(counters_reader: SharedPtr<ffi::CxxCountersReader>) -> Self{
         Self::new(counters_reader)
     }
 }

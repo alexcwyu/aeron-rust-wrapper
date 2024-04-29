@@ -80,7 +80,12 @@ impl Deref for Counter {
     type Target = ffi::CxxCounter;
 
     fn deref(&self) -> &Self::Target {
-        &self.counter.as_ref().unwrap()
+        match self.counter.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxCounter"
+            ),
+        }
     }
 }
 

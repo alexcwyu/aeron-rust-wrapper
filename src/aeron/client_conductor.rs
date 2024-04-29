@@ -16,20 +16,26 @@ pub mod ffi {
     unsafe extern "C++" {
 
         #[namespace = "aeron"]
-        type CxxCounter = crate::aeron::counter::ffi::CxxCounter;
+        #[rust_name = "CxxCounter"]
+        type Counter = crate::aeron::counter::ffi::CxxCounter;
         #[namespace = "aeron"]
-        type CxxImage = crate::aeron::image::ffi::CxxImage;
+        #[rust_name = "CxxImage"]
+        type Image = crate::aeron::image::ffi::CxxImage;
         #[namespace = "aeron"]
-        type CxxSubscription = crate::aeron::subscription::ffi::CxxSubscription;
+        #[rust_name = "CxxSubscription"]
+        type Subscription = crate::aeron::subscription::ffi::CxxSubscription;
 
         #[namespace = "aeron"]
-        type CxxPublication = crate::aeron::publication::ffi::CxxPublication;
+        #[rust_name = "CxxPublication"]
+        type Publication = crate::aeron::publication::ffi::CxxPublication;
 
         #[namespace = "aeron"]
-        type CxxExclusivePublication = crate::aeron::exclusive_publication::ffi::CxxExclusivePublication;
+        #[rust_name = "CxxExclusivePublication"]
+        type ExclusivePublication = crate::aeron::exclusive_publication::ffi::CxxExclusivePublication;
 
         #[namespace = "aeron::concurrent"]
-        type CxxCountersReader = crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
+        #[rust_name = "CxxCountersReader"]
+        type CountersReader = crate::aeron::concurrent::counters_reader::ffi::CxxCountersReader;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/ClientConductor.h");
         include!("aeron-rust-wrapper/cxx_wrapper/ClientConductor.cpp");
@@ -500,7 +506,12 @@ impl Deref for ClientConductor {
     type Target = ffi::CxxClientConductor;
 
     fn deref(&self) -> &Self::Target {
-        &self.conductor.as_ref().unwrap()
+        match self.conductor.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxClientConductor"
+            ),
+        }
     }
 }
 

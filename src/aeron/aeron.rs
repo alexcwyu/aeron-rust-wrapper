@@ -19,10 +19,10 @@ pub mod ffi {
 
         #[namespace = "aeron"]
         #[rust_name = "CxxCounter"]
-        type CxxCounter = crate::aeron::counter::ffi::CxxCounter;
+        type Counter = crate::aeron::counter::ffi::CxxCounter;
         #[namespace = "aeron"]
         #[rust_name = "CxxImage"]
-        type CxxImage = crate::aeron::image::ffi::CxxImage;
+        type Image = crate::aeron::image::ffi::CxxImage;
         #[namespace = "aeron"]
         #[rust_name = "CxxContext"]
         type Context = crate::aeron::context::ffi::CxxContext;
@@ -122,7 +122,7 @@ pub mod ffi {
 
         // c++ API: CountersReader &countersReader()
         #[rust_name = "counters_reader"]
-        fn countersReader(aeron: &SharedPtr<CxxAeron>) -> &CxxCountersReader;
+        fn countersReader(aeron: &SharedPtr<CxxAeron>) ->SharedPtr<CxxCountersReader>;
 
 
         // c++ API: Context &context()
@@ -343,7 +343,12 @@ impl Deref for Aeron {
     type Target = ffi::CxxAeron;
 
     fn deref(&self) -> &Self::Target {
-        &self.aeron.as_ref().unwrap()
+        match self.aeron.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxAeron"
+            ),
+        }
     }
 }
 

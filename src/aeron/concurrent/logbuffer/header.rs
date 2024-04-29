@@ -12,7 +12,8 @@ pub mod ffi {
     // C++ types and signatures exposed to Rust.
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/logbuffer/Header.h");
         include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/Header.cpp");
@@ -216,21 +217,35 @@ impl Header {
     pub fn get_ref(&self) -> &UniquePtr<ffi::CxxHeader> {
         &self.header
     }
+    #[inline]
+    pub fn as_mut(&mut self) -> Pin<&mut ffi::CxxHeader> {
+        self.header.as_mut().unwrap()
+    }
 }
 
 impl Deref for Header {
     type Target = CxxHeader;
 
     fn deref(&self) -> &Self::Target {
-        &self.header.as_ref().unwrap()
+        match self.header.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxHeader"
+            ),
+        }
     }
 }
 
-impl DerefMut for Header {
-    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
-        self.header.as_mut().unwrap()
-    }
-}
+// impl DerefMut for Header {
+//     fn deref_mut(&mut self) -> &mut Self::Target {
+//         match self.header.as_mut() {
+//             Some(target) => Pin::into_inner(target),
+//             None => panic!(
+//                 "called deref_mut on a null ffi::CxxHeader"
+//             ),
+//         }
+//     }
+// }
 
 
 impl From <UniquePtr<ffi::CxxHeader>> for Header{

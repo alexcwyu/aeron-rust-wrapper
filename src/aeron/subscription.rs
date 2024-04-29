@@ -12,15 +12,19 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
         #[namespace = "aeron::concurrent::logbuffer"]
-        type CxxHeader = crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
+        #[rust_name = "CxxHeader"]
+        type Header = crate::aeron::concurrent::logbuffer::header::ffi::CxxHeader;
         #[namespace = "aeron"]
-        type CxxControlledPollAction = crate::aeron::image::ffi::CxxControlledPollAction;
+        #[rust_name = "CxxControlledPollAction"]
+        type ControlledPollAction = crate::aeron::image::ffi::CxxControlledPollAction;
 
         #[namespace = "aeron"]
-        type CxxImage = crate::aeron::image::ffi::CxxImage;
+        #[rust_name = "CxxImage"]
+        type Image = crate::aeron::image::ffi::CxxImage;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/Subscription.h");
         include!("aeron-rust-wrapper/cxx_wrapper/Subscription.cpp");
@@ -261,7 +265,12 @@ impl Deref for Subscription {
     type Target = ffi::CxxSubscription;
 
     fn deref(&self) -> &Self::Target {
-        &self.subscription.as_ref().unwrap()
+        match self.subscription.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxSubscription"
+            ),
+        }
     }
 }
 

@@ -350,8 +350,14 @@ impl AtomicBuffer {
         ffi::get_string_without_length(&self.atomic_buffer, offset, length)
     }
 
+    #[inline]
     pub fn get_ref(&self) -> &UniquePtr<ffi::CxxAtomicBuffer> {
         &self.atomic_buffer
+    }
+
+    #[inline]
+    pub fn as_mut(&mut self) -> Pin<&mut ffi::CxxAtomicBuffer> {
+        self.atomic_buffer.as_mut().unwrap()
     }
 }
 
@@ -359,15 +365,25 @@ impl Deref for AtomicBuffer {
     type Target = ffi::CxxAtomicBuffer;
 
     fn deref(&self) -> &Self::Target {
-        &self.atomic_buffer.as_ref().unwrap()
+        match self.atomic_buffer.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxContext"
+            ),
+        }
     }
 }
 
-impl DerefMut for AtomicBuffer {
-    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
-        self.atomic_buffer.as_mut().unwrap()
-    }
-}
+// impl DerefMut for AtomicBuffer {
+//     fn deref_mut(&mut self) -> &mut Self::Target {
+//         match self.atomic_buffer.as_mut() {
+//             Some(target) => Pin::into_inner(target),
+//             None => panic!(
+//                 "called deref_mut on a null ffi::CxxAtomicBuffer"
+//             ),
+//         }
+//     }
+// }
 
 impl From <UniquePtr<ffi::CxxAtomicBuffer>> for AtomicBuffer{
     fn from(atomic_buffer: UniquePtr<ffi::CxxAtomicBuffer>) -> Self{

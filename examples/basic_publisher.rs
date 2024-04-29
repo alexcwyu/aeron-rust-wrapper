@@ -3,6 +3,7 @@ use std::io::{stdout, Write};
 use std::pin::pin;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::{slice, thread};
+use std::ops::Deref;
 use std::time::Duration;
 
 use cxx::{CxxString, let_cxx_string};
@@ -146,7 +147,7 @@ fn main() {
         stdout().flush().ok();
 
         loop {
-            let result = publication.offer_part(src_buffer.as_ref(), 0, c_str_msg.len() as i32);
+            let result = publication.offer_part(&src_buffer, 0, c_str_msg.len() as i32);
 
 
 

@@ -128,9 +128,9 @@ inline void removeCloseClientHandler(const std::shared_ptr<aeron::Aeron> &aeron,
 aeron->removeCloseClientHandler(registrationId);
 }
     
-inline const aeron::concurrent::CountersReader &countersReader(const std::shared_ptr<aeron::Aeron> &aeron)
+inline std::shared_ptr<aeron::concurrent::CountersReader> countersReader(const std::shared_ptr<aeron::Aeron> &aeron)
 {
-return aeron->countersReader();
+return std::make_shared<aeron::concurrent::CountersReader>(aeron->countersReader());
 }
 
 inline aeron::Context &context(const std::shared_ptr<aeron::Aeron> &aeron)

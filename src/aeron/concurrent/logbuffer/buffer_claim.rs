@@ -12,12 +12,13 @@ pub mod ffi {
     // C++ types and signatures exposed to Rust.
     unsafe extern "C++" {
         #[namespace = "aeron::concurrent"]
-        type CxxAtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
+        #[rust_name = "CxxAtomicBuffer"]
+        type AtomicBuffer = crate::aeron::concurrent::atomic_buffer::ffi::CxxAtomicBuffer;
 
         include!("aeron-rust-wrapper/aeron/aeron-client/src/main/cpp/concurrent/logbuffer/BufferClaim.h");
 
         include!("aeron-rust-wrapper/cxx_wrapper/concurrent/logbuffer/BufferClaim.cpp");
-        
+
         //this_t& flags(const std::uint8_t flags)
         //this_t &reservedValue(const std::int64_t value)
 
@@ -133,22 +134,35 @@ impl BufferClaim {
         &self.buffer_claim
     }
 
-
+    #[inline]
+    pub fn as_mut(&mut self) -> Pin<&mut ffi::CxxBufferClaim> {
+        self.buffer_claim.as_mut().unwrap()
+    }
 }
 
 impl Deref for BufferClaim {
     type Target = ffi::CxxBufferClaim;
 
     fn deref(&self) -> &Self::Target {
-        &self.buffer_claim.as_ref().unwrap()
+        match self.buffer_claim.as_ref() {
+            Some(target) => target,
+            None => panic!(
+                "called deref on a null ffi::CxxContext"
+            ),
+        }
     }
 }
 
-impl DerefMut for BufferClaim {
-    fn deref_mut(&mut self) -> Pin<&mut Self::Target> {
-        self.buffer_claim.as_mut().unwrap()
-    }
-}
+// impl DerefMut for BufferClaim {
+//     fn deref_mut(&mut self) -> &mut Self::Target {
+//         match self.buffer_claim.as_mut() {
+//             Some(target) => Pin::into_inner(target),
+//             None => panic!(
+//                 "called deref_mut on a null ffi::CxxContext"
+//             ),
+//         }
+//     }
+// }
 
 impl From <UniquePtr<ffi::CxxBufferClaim>> for BufferClaim {
     fn from(buffer_claim: UniquePtr<ffi::CxxBufferClaim>) -> Self{
